@@ -39,6 +39,9 @@
     .select{background:#fff;border:1px solid #dfe5f0;border-radius:10px;padding:9px 33px 9px 11px;color:#3d4b62;font-size:13px;max-width:100%;min-height:39px}
     .item{border:1px solid #e9edf4;background:#fff;border-radius:13px;padding:16px;margin-bottom:10px}
     .item:last-child{margin-bottom:0}.item .line{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .item.focused-task{border-color:#6970e9;box-shadow:0 0 0 3px #6669ea22;background:#fcfcff}
+    .assigned{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;border-radius:9px;background:#f0f2ff;color:#505b80;font-size:12px;line-height:1.4;padding:7px 10px;margin-top:10px}
+    .assigned strong{color:#263ab0;font-size:12px}
     .item-title{font-size:14px;line-height:1.43;font-weight:750;color:#263349;min-width:0;overflow-wrap:anywhere}
     .meta{font-size:12px;color:#7a8799;margin-top:8px;line-height:1.5;overflow-wrap:anywhere}
     .note{font-size:12px;color:#52617a;line-height:1.5;margin-top:9px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -72,6 +75,15 @@
     .timeline-subtitle{font-size:12px;color:#78869a;line-height:1.5;margin:6px 0 0}
     .timeline-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
     .timeline-tag{border-radius:99px;background:#f1f2ff;color:#5158b9;font-size:11px;font-weight:760;padding:8px 11px;white-space:nowrap}
+    .timeline-tools{display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:12px;margin:0 0 10px}
+    .timeline-tools .tabs{max-width:100%}
+    .timeline-tools .tab{min-height:37px}
+    .timeline-project-control{display:flex;flex-direction:column;gap:5px;color:#718095;font-size:11px;font-weight:750}
+    .timeline-project-control select{min-width:205px;max-width:100%}
+    .timeline-countline{font-size:12px;color:#728096;margin:0 0 18px;min-height:18px}
+    .timeline-more{display:flex;justify-content:center;margin:8px 0 0}
+    .timeline-action{margin-top:8px}
+    .timeline-action button{min-height:34px}
     .timeline-day{margin:0 0 20px}.timeline-day:last-child{margin-bottom:0}
     .timeline-day h3{font-size:12px;color:#8793a7;font-weight:780;text-transform:capitalize;margin:0 0 13px;letter-spacing:.01em}
     .timeline-list{list-style:none;margin:0 0 0 7px;padding:0 0 0 22px;border-left:2px solid #ebedf9}
@@ -105,7 +117,7 @@
     #toast[hidden]{display:none}
     @media(max-width:1000px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media(max-width:820px){.layout,.employee-layout{grid-template-columns:1fr}.shell{padding:22px 16px 30px}}
-    @media(max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:17px}.stat strong{font-size:26px}.panel{padding:17px}.switcher-wrap{align-items:stretch}.role-switch{width:100%}.role{flex:1;min-width:0}.top .btn{width:100%}.panel-header{align-items:flex-start}.app-header{padding-bottom:20px}.employee-intro{align-items:stretch}.employee-choice{width:100%}.item .line{align-items:flex-start}.brand{font-size:24px}}
+    @media(max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:17px}.stat strong{font-size:26px}.panel{padding:17px}.switcher-wrap{align-items:stretch}.role-switch{width:100%}.role{flex:1;min-width:0}.top .btn{width:100%}.panel-header{align-items:flex-start}.app-header{padding-bottom:20px}.employee-intro{align-items:stretch}.employee-choice{width:100%}.item .line{align-items:flex-start}.brand{font-size:24px}.timeline-panel{padding:17px}.timeline-tools{align-items:stretch}.timeline-tools .tabs{width:100%}.timeline-tools .tab{flex:1}.timeline-project-control{width:100%}.timeline-project-control select{width:100%}}
     @media(prefers-reduced-motion:no-preference){button{transition:background .15s,border-color .15s}}
   </style>
 </head>
@@ -145,7 +157,19 @@
           </div>
           <span id="timelineCount" class="timeline-tag">0 acontecimientos</span>
         </div>
-        <div id="timelineFeed" aria-live="polite" aria-relevant="additions text"></div>
+        <div class="timeline-tools">
+          <div class="tabs" role="group" aria-label="Filtrar acontecimientos">
+            <button class="tab" type="button" data-timeline-type="all" aria-pressed="true">Todos</button>
+            <button class="tab" type="button" data-timeline-type="blockers" aria-pressed="false">Bloqueos</button>
+            <button class="tab" type="button" data-timeline-type="done" aria-pressed="false">Terminados</button>
+          </div>
+          <label class="timeline-project-control" for="timelineProjectFilter">Proyecto en esta línea de tiempo
+            <select id="timelineProjectFilter" class="select"><option value="">Todos los proyectos</option></select>
+          </label>
+        </div>
+        <p class="timeline-countline" id="timelineSummary" role="status" aria-live="polite"></p>
+        <div id="timelineFeed"></div>
+        <div class="timeline-more"><button id="timelineMore" class="mini primary" type="button" hidden>Ver 10 más</button></div>
         <p class="timeline-privacy">Solo mostramos el tipo de acontecimiento, el entregable, el proyecto y su fecha. Las notas y el contenido de las decisiones no se publican aquí. Información local de este navegador.</p>
       </section>
       <div class="layout">
@@ -259,6 +283,8 @@
   const $ = id => document.getElementById(id);
   let tasks = [];
   let view = 'owner', period = 'today', employee = '', project = '', risk = 'all';
+  // Independent controls for the shared timeline; never modify task data.
+  let timelineType = 'all', timelineProject = '', timelineLimit = 10;
   let editingId = null, blockingId = null, progressId = null, decisionId = null, selfResolveId = null;
 
   function getStored(key) { try { return localStorage.getItem(key); } catch { return null; } }
@@ -286,29 +312,53 @@
       event.eventKind=eventKind;
       event.taskTitle=String(t.title||'');
       event.project=String(t.project||'');
+      event.taskId=t.id;
+      // Assigned responsibility, NOT the verified identity of the person who clicked.
+      event.assignedTo=String(t.owner||'');
     }
     t.history.push(event);
     if(t.history.length>80)t.history=t.history.slice(-80);
   }
   function sharedEvents() {
-    // Never use event.detail: it may contain private blocker reasons, progress notes
-    // or decision text. Legacy events are intentionally not backfilled or guessed.
+    // Only an allowlisted change kind, time, task/project and assigned person are
+    // published to this feed. NEVER read event.detail, notes, decisions or requests.
+    // Older events have no assignedTo: use the linked task's CURRENT assignee,
+    // explicitly labeled as such. History stays embedded in each task (v0.4 contract).
     return tasks.flatMap(t=>history(t).filter(e=>
       typeof e.eventKind==='string' && Object.prototype.hasOwnProperty.call(SHARED_KINDS,e.eventKind)
       && typeof e.at==='string' && Number.isFinite(Date.parse(e.at))
-    ).map(e=>({at:e.at,kind:e.eventKind,title:String(e.taskTitle??t.title??''),project:String(e.project??t.project??'')})))
-      .sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+    ).map(e=>{
+      const snapshot=typeof e.assignedTo==='string';
+      const sameTask=!Number.isSafeInteger(e.taskId)||e.taskId===t.id;
+      return {
+        at:e.at,kind:e.eventKind,title:String(e.taskTitle??t.title??''),
+        project:String(e.project??t.project??''),
+        assignedTo:snapshot?e.assignedTo:String(t.owner||''),
+        assignedLabel:snapshot?'Asignado a':'Responsable actual',
+        taskId:sameTask?t.id:null
+      };
+    })).sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+  }
+  function filteredTimelineEvents(){
+    return sharedEvents().filter(e=>(!timelineProject||e.project===timelineProject)
+      && (timelineType==='all'||timelineType==='done'&&e.kind==='done'
+        ||timelineType==='blockers'&&e.kind.startsWith('blocker_')));
   }
   function renderTimeline(){
-    const events=sharedEvents().filter(e=>!project||e.project===project);
+    const events=filteredTimelineEvents();
+    const shown=Math.min(timelineLimit,events.length);
     $('timelineCount').textContent=`${events.length} acontecimiento${events.length===1?'':'s'}`;
+    $('timelineSummary').textContent=`${events.length} acontecimiento${events.length===1?'':'s'} · mostrando ${shown}`;
+    $('timelineMore').hidden=shown===events.length;
+    document.querySelectorAll('[data-timeline-type]').forEach(btn=>
+      btn.setAttribute('aria-pressed',String(btn.dataset.timelineType===timelineType)));
     if(!events.length){
-      $('timelineFeed').innerHTML='<div class="empty">Todavía no hay acontecimientos registrados'+(project?' en este proyecto':'')+'. Termina un entregable o reporta un bloqueo para comenzar la línea de tiempo. Los eventos anteriores no se reconstruyen automáticamente.</div>';
+      $('timelineFeed').innerHTML='<div class="empty">Sin acontecimientos para estos filtros. Cambia el tipo o proyecto para consultar otros registros.</div>';
       return;
     }
     const today=localDate(),yesterday=plusDays(-1);
     const groups=new Map();
-    for(const e of events.slice(0,30)){
+    for(const e of events.slice(0,shown)){
       const d=new Date(e.at),date=localDate(d);
       if(!groups.has(date))groups.set(date,[]);
       groups.get(date).push(e);
@@ -317,7 +367,11 @@
       const heading=date===today?'Hoy':date===yesterday?'Ayer':new Date(date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
       return `<section class="timeline-day"><h3>${esc(heading)}</h3><ol class="timeline-list">${items.map(e=>{
         const time=new Date(e.at).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
-        return `<li class="timeline-event ${e.kind}"><div class="timeline-event-head"><span class="timeline-label">${SHARED_KINDS[e.kind]}</span><time datetime="${esc(e.at)}">${esc(time)}</time></div><p class="timeline-task">${esc(e.title)}</p><p class="timeline-project">${esc(e.project)}</p></li>`;
+        const linked=e.taskId!==null && taskById(e.taskId);
+        return `<li class="timeline-event ${e.kind}"><div class="timeline-event-head"><span class="timeline-label">${SHARED_KINDS[e.kind]}</span><time datetime="${esc(e.at)}">${esc(time)}</time></div>
+          <p class="timeline-task">${esc(e.title)}</p><p class="timeline-project">${esc(e.project)}</p>
+          <div class="assigned">${esc(e.assignedLabel)} <strong>${esc(e.assignedTo||'Sin asignar')}</strong></div>
+          ${linked?`<div class="timeline-action"><button type="button" class="mini" data-action="show-task" data-id="${e.taskId}">Ver entregable</button></div>`:''}</li>`;
       }).join('')}</ol></section>`;
     }).join('');
   }
@@ -368,8 +422,9 @@
       actions.push(`<button type="button" class="mini danger" data-action="delete" data-id="${t.id}">Eliminar</button>`);
     }
     const pr=priority(t);
-    return `<article class="item"><div class="line"><strong class="item-title">${esc(t.title)}</strong><span class="pill ${status}">${statusLabel(t.status)}</span></div>
-      <div class="meta">${esc(t.project)} · ${esc(t.owner)} · ${esc(t.due)}</div>
+    return `<article class="item" data-task-id="${t.id}" tabindex="-1"><div class="line"><strong class="item-title">${esc(t.title)}</strong><span class="pill ${status}">${statusLabel(t.status)}</span></div>
+      <div class="meta">${esc(t.project)} · ${esc(t.due)}</div>
+      ${mode==='owner'?`<div class="assigned">Asignado a <strong>${esc(t.owner||'Sin asignar')}</strong></div>`:''}
       <div class="actions" style="margin-top:9px">${dateTag(t)}${pr!=='normal'?`<span class="pill ${pr}">Prioridad ${pr==='high'?'alta':'baja'}</span>`:''}</div>
       <div class="progress-row"><div class="progress-track" role="progressbar" aria-label="Avance estimado" aria-valuenow="${progress(t)}" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" style="width:${progress(t)}%"></div></div><span>${progress(t)}% de avance</span></div>
       ${t.notes && !(t.status==='blocked' && t.notes===blockerReason(t))?`<div class="note">${esc(t.notes)}</div>`:''}
@@ -383,6 +438,12 @@
     $('projectFilter').innerHTML='<option value="">Todos los proyectos</option>'+projects.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
     $('projectFilter').value=project;$('riskFilter').value=risk;
     $('projectCount').textContent=`${projects.length} proyecto${projects.length===1?'':'s'}`;
+    // The timeline has its own project filter; selecting a plan filter cannot
+    // silently change the history being reviewed.
+    const timelineProjects=[...new Set(sharedEvents().map(e=>e.project).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    if(timelineProject&&!timelineProjects.includes(timelineProject))timelineProject='';
+    $('timelineProjectFilter').innerHTML='<option value="">Todos los proyectos</option>'+timelineProjects.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+    $('timelineProjectFilter').value=timelineProject;
     const people=[...new Set(tasks.map(t=>String(t.owner||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
     if(!people.includes(employee))employee=people[0]||'';
     $('employeeSelect').innerHTML=people.length?people.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join(''):'<option value="">Sin responsables</option>';
@@ -404,7 +465,8 @@
     $('ownerTasks').innerHTML=ownerTasks.length?ownerTasks.map(t=>taskHtml(t,'owner')).join(''):'<div class="empty">No hay entregables con este filtro.</div>';
     renderTimeline();
     const urgent=tasks.filter(t=>t.status==='blocked'||isOverdue(t)).sort((a,b)=>(a.status!=='blocked')-(b.status!=='blocked')||sortTasks(a,b));
-    $('attention').innerHTML=urgent.length?urgent.map(t=>`<article class="item"><div class="line"><span class="pill ${t.status==='blocked'?'blocked':'overdue'}">${t.status==='blocked'?'Bloqueo pendiente':'Fecha vencida'}</span>${dateTag(t)}</div><div class="item-title" style="margin-top:11px">${esc(t.title)}</div><div class="meta">${esc(t.project)} · ${esc(t.owner)}</div>
+    $('attention').innerHTML=urgent.length?urgent.map(t=>`<article class="item"><div class="line"><span class="pill ${t.status==='blocked'?'blocked':'overdue'}">${t.status==='blocked'?'Bloqueo pendiente':'Fecha vencida'}</span>${dateTag(t)}</div><div class="item-title" style="margin-top:11px">${esc(t.title)}</div><div class="meta">${esc(t.project)}</div>
+      <div class="assigned">Asignado a <strong>${esc(t.owner||'Sin asignar')}</strong></div>
       <div class="note">${t.status==='blocked'?esc(blockerReason(t)): `Compromiso: ${esc(t.due)} · Reprogramar en «Editar».`}</div>
       ${t.status==='blocked'&&t.blockerRequest?`<div class="note"><strong>Necesita:</strong> ${esc(t.blockerRequest)}</div>`:''}
       <div class="actions"><button type="button" class="mini primary" data-action="${t.status==='blocked'?'decide':'edit'}" data-id="${t.id}">${t.status==='blocked'?'Registrar decisión':'Reprogramar'}</button></div></article>`).join(''):'<div class="empty">Sin bloqueos ni atrasos pendientes. ✨</div>';
@@ -452,7 +514,20 @@
     $('selfResolveNote').value='';
     $('selfResolveDialog').showModal();
   }
+  function showTaskFromTimeline(id){
+    const t=taskById(id);
+    if(!t){toast('Este entregable ya no está disponible.');return;}
+    view='owner';store(VIEW_KEY,view);
+    project=String(t.project||'');risk='all';render();
+    const card=[...$('ownerTasks').querySelectorAll('[data-task-id]')].find(n=>n.dataset.taskId===String(id));
+    if(!card){toast('No se pudo localizar el entregable.');return;}
+    card.classList.add('focused-task');
+    card.focus({preventScroll:true});
+    const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    card.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+  }
   function doAction(action,id) {
+    if(action==='show-task')return showTaskFromTimeline(id);
     const t=taskById(id);if(!t)return;
     if(action==='done')return changeStatus(id,'done');
     if(action==='open')return changeStatus(id,'open');
@@ -466,6 +541,7 @@
   document.addEventListener('click',e=>{
     const btn=e.target.closest('button');if(!btn)return;
     if(btn.dataset.view){view=btn.dataset.view;store(VIEW_KEY,view);render();}
+    else if(btn.dataset.timelineType){timelineType=btn.dataset.timelineType;timelineLimit=10;renderTimeline();}
     else if(btn.dataset.period){period=btn.dataset.period;render();}
     else if(btn.dataset.action){const id=Number(btn.dataset.id);if(Number.isSafeInteger(id))doAction(btn.dataset.action,id);}
     else if(btn.dataset.close){$(btn.dataset.close).close();}
@@ -473,6 +549,8 @@
   $('employeeSelect').addEventListener('change',e=>{employee=e.target.value;store(PERSON_KEY,employee);render();});
   $('projectFilter').addEventListener('change',e=>{project=e.target.value;render();});
   $('riskFilter').addEventListener('change',e=>{risk=e.target.value;render();});
+  $('timelineProjectFilter').addEventListener('change',e=>{timelineProject=e.target.value;timelineLimit=10;renderTimeline();});
+  $('timelineMore').addEventListener('click',()=>{timelineLimit+=10;renderTimeline();});
   $('newTask').addEventListener('click',()=>openEditor());
   $('progressPercent').addEventListener('input',()=>{$('progressLabel').textContent=$('progressPercent').value+'%';});
   $('taskform').addEventListener('submit',e=>{
