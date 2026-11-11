@@ -28,13 +28,14 @@
     .lead{margin:0;color:#6d7b91;font-size:14px;line-height:1.55}
     .btn{border:1px solid #555de4;background:#545ce4;color:white;border-radius:11px;font-weight:720;padding:12px 16px;font-size:13px;min-height:43px;box-shadow:0 5px 14px #545ce422}
     .btn:hover{background:#454cc8}.btn.secondary{background:#fff;border-color:#dee5ef;color:#3d4a61;box-shadow:none}.btn.secondary:hover{background:#f6f8fc}
-    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:0 0 19px}
+    .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:13px;margin:0 0 19px}
     .stat,.panel,.employee-intro{background:#fff;border:1px solid #e5eaf3;border-radius:17px;box-shadow:0 3px 12px #1d345405}
     .stat{padding:20px 20px 19px}.stat small{color:#738096;font-size:12px;font-weight:650}.stat strong{display:block;color:#17243a;font-size:30px;font-weight:780;letter-spacing:-1px;margin-top:9px}
     .stat.alert strong{color:#c96e3b}.stat.complete strong{color:#26976e}
     .layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:16px}
     .panel{padding:21px;min-width:0}.panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:17px}.panel h2{font-size:17px;letter-spacing:-.3px;margin:0;font-weight:760}
     .hint{color:#8a95a7;font-size:12px}.hint strong{color:#69788e}
+    .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
     .select{background:#fff;border:1px solid #dfe5f0;border-radius:10px;padding:9px 33px 9px 11px;color:#3d4b62;font-size:13px;max-width:100%;min-height:39px}
     .item{border:1px solid #e9edf4;background:#fff;border-radius:13px;padding:16px;margin-bottom:10px}
     .item:last-child{margin-bottom:0}.item .line{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
@@ -43,7 +44,13 @@
     .note{font-size:12px;color:#52617a;line-height:1.5;margin-top:9px;white-space:pre-wrap;overflow-wrap:anywhere}
     .pill{font-size:11px;padding:5px 9px;border-radius:99px;white-space:nowrap;background:#eaedff;color:#434dcc;font-weight:700}
     .pill.blocked{background:#fff0e8;color:#bc552a}.pill.done{background:#e7f8ef;color:#177a52}
+    .pill.high{background:#fff1ec;color:#b75032}.pill.low{background:#f2f4f8;color:#69768b}
     .pill.overdue{background:#fff1ec;color:#c05c3b}.pill.due{background:#edf2ff;color:#4b59bf}
+    .progress-row{display:flex;align-items:center;gap:10px;margin-top:10px;color:#728096;font-size:11px;font-weight:650}
+    .progress-track{height:6px;flex:1;max-width:170px;border-radius:99px;background:#eef1fa;overflow:hidden}
+    .progress-fill{height:100%;background:#6970ec;border-radius:99px}
+    .activity{margin-top:12px;border-top:1px solid #edf1f6;padding-top:10px;color:#78859a;font-size:11px}
+    .activity summary{cursor:pointer;font-weight:700}.activity ol{list-style:none;margin:10px 0 0;padding:0}.activity li{padding:8px 0;border-top:1px solid #f1f3f7;line-height:1.5}.activity li strong{display:block;color:#52617b}.activity time{font-size:10px;color:#9ba6b6}.activity .detail{white-space:pre-wrap;overflow-wrap:anywhere}
     .actions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
     .mini{border:1px solid #dfe5ef;background:white;padding:8px 10px;border-radius:9px;font-size:12px;color:#48566e;font-weight:650}
     .mini:hover{background:#f7f8fc;border-color:#bfc8dc}.mini.primary{color:#434bc0;border-color:#cbd0fd;background:#f7f7ff}.mini.danger{color:#aa6870}
@@ -62,6 +69,7 @@
     .employee-summary{display:flex;gap:10px;align-items:baseline;color:#66758b;font-size:12px;margin-top:13px}.employee-summary strong{font-size:29px;letter-spacing:-1px;color:#202d45}
     .foot{font-size:11px;line-height:1.65;color:#919cae;margin-top:24px}
     .view[hidden]{display:none!important}
+    input[type="range"]{width:100%;padding:0;accent-color:#545ce4;min-height:28px}
     dialog{border:0;border-radius:20px;box-shadow:0 25px 85px #101c4845;width:min(480px,94vw);padding:25px;color:#17243a}
     dialog::backdrop{background:#14234779}
     dialog h2{margin:0 0 8px;font-size:21px;letter-spacing:-.5px}dialog .dialog-sub{color:#7b8899;font-size:13px;line-height:1.45;margin:0 0 17px}
@@ -72,6 +80,7 @@
     .notice{margin-top:15px;color:#76859a;font-size:11px;line-height:1.5}
     #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#263650;color:#fff;border-radius:10px;padding:11px 17px;font-size:12px;box-shadow:0 8px 24px #18284330;z-index:20;max-width:min(90vw,420px);text-align:center}
     #toast[hidden]{display:none}
+    @media(max-width:1000px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media(max-width:820px){.layout,.employee-layout{grid-template-columns:1fr}.shell{padding:22px 16px 30px}}
     @media(max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:17px}.stat strong{font-size:26px}.panel{padding:17px}.switcher-wrap{align-items:stretch}.role-switch{width:100%}.role{flex:1;min-width:0}.top .btn{width:100%}.panel-header{align-items:flex-start}.app-header{padding-bottom:20px}.employee-intro{align-items:stretch}.employee-choice{width:100%}.item .line{align-items:flex-start}.brand{font-size:24px}}
     @media(prefers-reduced-motion:no-preference){button{transition:background .15s,border-color .15s}}
@@ -87,15 +96,15 @@
   <section class="switcher-wrap" aria-label="Selector de vista">
     <span class="eyebrow">Espacio de trabajo</span>
     <div class="role-switch" role="group" aria-label="Vista del prototipo">
-      <button id="ownerTab" class="role" type="button" data-view="owner" aria-pressed="true">Dueño</button>
-      <button id="employeeTab" class="role" type="button" data-view="employee" aria-pressed="false">Empleado</button>
+      <button id="ownerTab" class="role" type="button" data-view="owner" aria-pressed="true">Vista general</button>
+      <button id="employeeTab" class="role" type="button" data-view="employee" aria-pressed="false">Mi trabajo</button>
     </div>
   </section>
 
   <main>
     <div class="view" id="ownerView">
       <div class="top">
-        <div><div class="eyebrow">Panel general</div><h1>Tu equipo, en sincronía.</h1><p class="lead">Entregables claros. Bloqueos visibles. Decisiones a tiempo.</p></div>
+        <div><div class="eyebrow">Vista general</div><h1>El trabajo, bajo control.</h1><p class="lead">Planifica entregables, detecta atrasos y toma decisiones con contexto.</p></div>
         <button class="btn" type="button" id="newTask">+ Nuevo entregable</button>
       </div>
       <section class="stats" aria-label="Indicadores de proyectos">
@@ -103,14 +112,15 @@
         <div class="stat"><small>Para hoy</small><strong id="today">0</strong></div>
         <div class="stat alert"><small>Bloqueados</small><strong id="blocked">0</strong></div>
         <div class="stat complete"><small>Terminados</small><strong id="done">0</strong></div>
+        <div class="stat alert"><small>Vencidos</small><strong id="overdue">0</strong></div>
       </section>
       <div class="layout">
         <section class="panel" aria-label="Plan de trabajo">
-          <div class="panel-header"><div><h2>Plan de trabajo</h2><span class="hint" id="projectCount"></span></div><select id="projectFilter" class="select" aria-label="Filtrar por proyecto"><option value="">Todos los proyectos</option></select></div>
+          <div class="panel-header"><div><h2>Plan de trabajo</h2><span class="hint" id="projectCount"></span></div><div class="filters"><select id="projectFilter" class="select" aria-label="Filtrar por proyecto"><option value="">Todos los proyectos</option></select><select id="riskFilter" class="select" aria-label="Filtrar por situación"><option value="all">Todos</option><option value="overdue">Vencidos</option><option value="blocked">Bloqueados</option><option value="active">En ejecución</option></select></div></div>
           <div id="ownerTasks"></div>
         </section>
         <section class="panel" aria-label="Bloqueos y decisiones">
-          <div class="panel-header"><h2>Necesitan tu atención</h2><span class="hint">Bloqueos por resolver</span></div>
+          <div class="panel-header"><h2>Necesitan tu atención</h2><span class="hint">Bloqueos y fechas vencidas</span></div>
           <div id="attention"></div>
         </section>
       </div>
@@ -118,7 +128,7 @@
 
     <div class="view" id="employeeView" hidden>
       <div class="top">
-        <div><div class="eyebrow">Mi jornada</div><h1>Lo importante, a la vista.</h1><p class="lead">Consulta tus entregables, reporta avances y avisa si algo te detiene.</p></div>
+        <div><div class="eyebrow">Mi trabajo</div><h1>Lo importante, a la vista.</h1><p class="lead">Actualiza avances, reporta bloqueos y mantén el trabajo al día.</p></div>
       </div>
       <div class="employee-intro">
         <div><strong style="font-size:14px">¿Qué responsable quieres consultar?</strong><p>Selección de demostración: no verifica la identidad de nadie.</p></div>
@@ -139,7 +149,7 @@
           <div class="employee-summary"><strong id="employeeBlocked">0</strong><span>bloqueos pendientes</span></div>
           <div style="height:1px;background:#ecf0f6;margin:21px 0"></div>
           <div class="side-label">Comunicación simple</div>
-          <div class="info-box"><p><strong>¿Algo impide continuar?</strong> Abre el entregable y usa «Reportar bloqueo». El motivo aparecerá de inmediato en la vista Dueño de este navegador.</p></div>
+          <div class="info-box"><p><strong>¿Algo impide continuar?</strong> Abre el entregable y usa «Reportar bloqueo». El motivo aparecerá en Vista general de este navegador, donde se podrá registrar una decisión.</p></div>
         </aside>
       </div>
     </div>
@@ -150,13 +160,14 @@
 
 <dialog id="editor">
   <form id="taskform">
-    <h2>Nuevo entregable</h2><p class="dialog-sub">Define el trabajo y el responsable.</p>
+    <h2 id="editorHeading">Nuevo entregable</h2><p class="dialog-sub">Define el trabajo, el responsable y la fecha.</p>
     <label class="field" for="taskTitle">Entregable</label><input id="taskTitle" name="title" required maxlength="120" placeholder="Ej. Confirmar acceso a instalaciones">
     <label class="field" for="taskOwner">Responsable</label><input id="taskOwner" name="owner" required maxlength="70" placeholder="Ej. Ana">
     <label class="field" for="taskProject">Proyecto</label><input id="taskProject" name="project" required maxlength="90" placeholder="Ej. Instalación CCTV">
     <label class="field" for="taskDue">Fecha compromiso</label><input id="taskDue" name="due" type="date" required>
+    <label class="field" for="taskPriority">Prioridad</label><select id="taskPriority" name="priority"><option value="normal">Normal</option><option value="high">Alta</option><option value="low">Baja</option></select>
     <label class="field" for="taskNotes">Notas (opcional)</label><textarea id="taskNotes" name="notes" maxlength="500"></textarea>
-    <div class="dialog-actions"><button type="button" class="btn secondary" data-close="editor">Cancelar</button><button class="btn" type="submit">Guardar</button></div>
+    <div class="dialog-actions"><button type="button" class="btn secondary" data-close="editor">Cancelar</button><button class="btn" type="submit" id="saveTask">Guardar</button></div>
   </form>
 </dialog>
 
@@ -164,141 +175,241 @@
   <form id="blockerForm">
     <h2>Reportar bloqueo</h2><p id="blockerTask" class="dialog-sub"></p>
     <label class="field" for="blockerReason">¿Qué impide avanzar?</label>
-    <textarea id="blockerReason" required maxlength="500" placeholder="Describe brevemente qué necesitas para avanzar."></textarea>
+    <textarea id="blockerReason" required maxlength="500" placeholder="Describe qué pasó."></textarea>
+    <label class="field" for="blockerRequest">¿Qué necesitas para continuar? (opcional)</label>
+    <textarea id="blockerRequest" maxlength="300" placeholder="Ej. Autorización para acceder al sitio."></textarea>
     <div class="dialog-actions"><button type="button" class="btn secondary" data-close="blockerDialog">Cancelar</button><button class="btn" type="submit">Guardar bloqueo</button></div>
+  </form>
+</dialog>
+<dialog id="progressDialog">
+  <form id="progressForm">
+    <h2>Registrar avance</h2><p id="progressTask" class="dialog-sub"></p>
+    <label class="field" for="progressPercent">Avance estimado: <output id="progressLabel" for="progressPercent">0%</output></label>
+    <input id="progressPercent" type="range" min="0" max="100" step="10" value="0">
+    <label class="field" for="progressNote">¿Qué cambió?</label>
+    <textarea id="progressNote" required maxlength="300" placeholder="Ej. Instalamos las cámaras; faltan las pruebas."></textarea>
+    <p class="notice">Al llegar al 100%, el entregable se marcará terminado. Un bloqueo reportado se mantiene hasta registrar la decisión.</p>
+    <div class="dialog-actions"><button type="button" class="btn secondary" data-close="progressDialog">Cancelar</button><button class="btn" type="submit">Guardar avance</button></div>
+  </form>
+</dialog>
+<dialog id="decisionDialog">
+  <form id="decisionForm">
+    <h2>Registrar decisión</h2><p id="decisionTask" class="dialog-sub"></p>
+    <div id="decisionContext" class="info-box"></div>
+    <label class="field" for="decisionText">¿Qué se decidió para desbloquearlo?</label>
+    <textarea id="decisionText" required maxlength="500" placeholder="Ej. Se autorizó el acceso y se acordó entrar el jueves."></textarea>
+    <label class="field" for="decisionDue">Nueva fecha compromiso (opcional)</label>
+    <input id="decisionDue" type="date">
+    <div class="dialog-actions"><button type="button" class="btn secondary" data-close="decisionDialog">Cancelar</button><button class="btn" type="submit">Guardar y desbloquear</button></div>
   </form>
 </dialog>
 <div id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
   'use strict';
-  // Preserve the v0.1 data key: no migration or loss of existing local records.
+  // Keep the exact v0.1 localStorage key. New task properties are optional and backward-compatible.
   const KEY = 'casces_pulso_v1';
   const VIEW_KEY = 'casces_pulso_view_v2';
   const PERSON_KEY = 'casces_pulso_employee_v2';
   const $ = id => document.getElementById(id);
   let tasks = [];
-  let view = 'owner';
-  let period = 'today';
-  let employee = '';
-  let project = '';
-  let blockingTaskId = null;
+  let view = 'owner', period = 'today', employee = '', project = '', risk = 'all';
+  let editingId = null, blockingId = null, progressId = null, decisionId = null;
 
   function getStored(key) { try { return localStorage.getItem(key); } catch { return null; } }
   function store(key, val) { try { localStorage.setItem(key, val); return true; } catch { toast('No se pudo guardar en este navegador.'); return false; } }
-  function localDate(date) { const d = date || new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-  function plusDays(n) { const d=new Date(); d.setDate(d.getDate()+n); return localDate(d); }
-  function weekBounds() { const now=new Date(), mon=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(now.getDay()+6)%7),sun=new Date(mon); sun.setDate(mon.getDate()+6); return [localDate(mon),localDate(sun)]; }
+  function localDate(date) { const d=date||new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+  function plusDays(n) { const d=new Date();d.setDate(d.getDate()+n);return localDate(d); }
+  function weekBounds() { const d=new Date(),mon=new Date(d.getFullYear(),d.getMonth(),d.getDate()-(d.getDay()+6)%7),sun=new Date(mon);sun.setDate(mon.getDate()+6);return [localDate(mon),localDate(sun)]; }
   function esc(v) { return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function stamp() { return new Date().toISOString(); }
+  function progress(t) { const n=Number(t.progress);return Number.isFinite(n)?Math.max(0,Math.min(100,Math.round(n))):t.status==='done'?100:0; }
+  function priority(t) { return ['high','normal','low'].includes(t.priority)?t.priority:'normal'; }
+  function history(t) { return Array.isArray(t.history)?t.history.filter(e=>e&&typeof e==='object'):[]; }
+  function log(t,type,detail='') { if(!Array.isArray(t.history))t.history=[];t.history.push({at:stamp(),type:String(type),detail:String(detail)});if(t.history.length>80)t.history=t.history.slice(-80); }
+  function blockerReason(t) { return String(t.blockerReason || (t.status==='blocked'?t.notes:'') || 'Sin detalle.'); }
+  function isOverdue(t) { return t.status!=='done' && String(t.due||'') < localDate(); }
+  function taskById(id) { return tasks.find(t=>t.id===id); }
   function load() {
     const raw=getStored(KEY);
-    if (raw === null) {
-      tasks = [
+    if(raw===null){
+      tasks=[
         {id:1,title:'Confirmar llegada de cámaras',owner:'Ana',project:'Instalación CCTV · Cliente Norte',due:plusDays(0),status:'open',notes:''},
         {id:2,title:'Validar acceso al cuarto de servidores',owner:'Luis',project:'Instalación CCTV · Cliente Norte',due:plusDays(0),status:'blocked',notes:'El cliente todavía no confirma el acceso'},
         {id:3,title:'Entregar checklist de pruebas',owner:'María',project:'Control de acceso · Oficina Centro',due:plusDays(2),status:'open',notes:''}
-      ];
-      save();
-    } else {
-      try { const parsed=JSON.parse(raw); tasks=Array.isArray(parsed)?parsed.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[]; }
-      catch { tasks=[]; toast('No se pudieron leer los datos guardados.'); }
+      ];save();
+    }else{
+      try { const v=JSON.parse(raw);tasks=Array.isArray(v)?v.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[]; }
+      catch {tasks=[];toast('No se pudieron leer los datos guardados.');}
     }
-    view=getStored(VIEW_KEY)==='employee'?'employee':'owner';
-    employee=getStored(PERSON_KEY)||'';
+    view=getStored(VIEW_KEY)==='employee'?'employee':'owner';employee=getStored(PERSON_KEY)||'';
   }
-  function save() { return store(KEY,JSON.stringify(tasks)); }
-  function toast(message) { const node=$('toast'); node.textContent=message; node.hidden=false; }
-  function statusLabel(s) { return s==='blocked'?'Bloqueado':s==='done'?'Terminado':'En curso'; }
-  function sortTasks(a,b) { return (a.status==='done')-(b.status==='done')||String(a.due||'').localeCompare(String(b.due||'')); }
-  function dateTag(t) {
-    const date=String(t.due||'');
-    if(t.status!=='done'&&date<localDate())return '<span class="pill overdue">Vencido</span>';
-    if(t.status!=='done'&&date===localDate())return '<span class="pill due">Hoy</span>';
-    return '';
+  function save() {return store(KEY,JSON.stringify(tasks));}
+  function toast(message) {const node=$('toast');node.textContent=message;node.hidden=false;}
+  function statusLabel(s) {return s==='blocked'?'Bloqueado':s==='done'?'Terminado':s==='in_progress'?'En curso':'Pendiente';}
+  function sortTasks(a,b) {return (a.status==='done')-(b.status==='done') || String(a.due||'').localeCompare(String(b.due||'')) || String(a.title||'').localeCompare(String(b.title||''),'es');}
+  function dateTag(t) {return isOverdue(t)?'<span class="pill overdue">Vencido</span>':t.status!=='done'&&t.due===localDate()?'<span class="pill due">Hoy</span>':'';}
+  function activityHtml(t) {
+    const h=history(t);if(!h.length)return '';
+    return `<details class="activity"><summary>Actividad · ${h.length} registro${h.length===1?'':'s'}</summary><ol>${[...h].reverse().map(e=>{
+      const when=Number.isNaN(Date.parse(e.at))?'':new Date(e.at).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'});
+      return `<li><strong>${esc(e.type)}</strong>${when?`<time>${esc(when)}</time>`:''}${e.detail?`<div class="detail">${esc(e.detail)}</div>`:''}</li>`;
+    }).join('')}</ol></details>`;
   }
-  function taskHtml(t,role) {
+  function taskHtml(t,mode) {
     const status=['blocked','done'].includes(t.status)?t.status:'';
     const actions=[];
     if(t.status==='done')actions.push(`<button type="button" class="mini" data-action="open" data-id="${t.id}">Reabrir</button>`);
     else if(t.status==='blocked'){
-      actions.push(`<button type="button" class="mini primary" data-action="open" data-id="${t.id}">Resolver bloqueo</button>`);
-      actions.push(`<button type="button" class="mini" data-action="block" data-id="${t.id}">Editar motivo</button>`);
-    } else {
-      actions.push(`<button type="button" class="mini primary" data-action="done" data-id="${t.id}">✓ Terminar</button>`);
-      actions.push(`<button type="button" class="mini" data-action="block" data-id="${t.id}">⚑ Reportar bloqueo</button>`);
+      if(mode==='owner')actions.push(`<button type="button" class="mini primary" data-action="decide" data-id="${t.id}">Registrar decisión</button>`);
+      actions.push(`<button type="button" class="mini" data-action="block" data-id="${t.id}">Actualizar bloqueo</button>`);
+    }else{
+      actions.push(`<button type="button" class="mini primary" data-action="progress" data-id="${t.id}">+ Registrar avance</button>`);
+      actions.push(`<button type="button" class="mini" data-action="done" data-id="${t.id}">✓ Terminar</button>`);
+      actions.push(`<button type="button" class="mini" data-action="block" data-id="${t.id}">Reportar bloqueo</button>`);
     }
-    if(role==='owner') actions.push(`<button type="button" class="mini danger" data-action="delete" data-id="${t.id}">Eliminar</button>`);
+    if(mode==='owner'){
+      actions.push(`<button type="button" class="mini" data-action="edit" data-id="${t.id}">Editar</button>`);
+      actions.push(`<button type="button" class="mini danger" data-action="delete" data-id="${t.id}">Eliminar</button>`);
+    }
+    const pr=priority(t);
     return `<article class="item"><div class="line"><strong class="item-title">${esc(t.title)}</strong><span class="pill ${status}">${statusLabel(t.status)}</span></div>
       <div class="meta">${esc(t.project)} · ${esc(t.owner)} · ${esc(t.due)}</div>
-      ${dateTag(t)}${t.notes?`<div class="note">${esc(t.notes)}</div>`:''}
-      <div class="actions">${actions.join('')}</div></article>`;
+      <div class="actions" style="margin-top:9px">${dateTag(t)}${pr!=='normal'?`<span class="pill ${pr}">Prioridad ${pr==='high'?'alta':'baja'}</span>`:''}</div>
+      <div class="progress-row"><div class="progress-track" role="progressbar" aria-label="Avance estimado" aria-valuenow="${progress(t)}" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" style="width:${progress(t)}%"></div></div><span>${progress(t)}% de avance</span></div>
+      ${t.notes && !(t.status==='blocked' && t.notes===blockerReason(t))?`<div class="note">${esc(t.notes)}</div>`:''}
+      ${t.status==='blocked'?`<div class="info-box" style="margin-top:10px"><strong>Bloqueo:</strong> ${esc(blockerReason(t))}${t.blockerRequest?`<p><strong>Se necesita:</strong> ${esc(t.blockerRequest)}</p>`:''}</div>`:''}
+      ${t.lastDecision&&t.status!=='blocked'?`<div class="note"><strong>Última decisión:</strong> ${esc(t.lastDecision)}</div>`:''}
+      <div class="actions">${actions.join('')}</div>${activityHtml(t)}</article>`;
   }
   function syncSelects() {
     const projects=[...new Set(tasks.map(t=>String(t.project||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
     if(project&&!projects.includes(project))project='';
     $('projectFilter').innerHTML='<option value="">Todos los proyectos</option>'+projects.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
-    $('projectFilter').value=project;
+    $('projectFilter').value=project;$('riskFilter').value=risk;
     $('projectCount').textContent=`${projects.length} proyecto${projects.length===1?'':'s'}`;
-    const owners=[...new Set(tasks.map(t=>String(t.owner||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
-    if(!owners.includes(employee))employee=owners[0]||'';
-    $('employeeSelect').innerHTML=owners.length?owners.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join(''):'<option value="">Sin responsables</option>';
+    const people=[...new Set(tasks.map(t=>String(t.owner||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    if(!people.includes(employee))employee=people[0]||'';
+    $('employeeSelect').innerHTML=people.length?people.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join(''):'<option value="">Sin responsables</option>';
     $('employeeSelect').value=employee;
   }
   function render() {
     syncSelects();
-    $('ownerView').hidden=view!=='owner'; $('employeeView').hidden=view!=='employee';
-    document.querySelectorAll('[data-view]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.view===view)));
-    document.querySelectorAll('[data-period]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.period===period)));
+    $('ownerView').hidden=view!=='owner';$('employeeView').hidden=view!=='employee';
+    document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
+    document.querySelectorAll('[data-period]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.period===period)));
     $('total').textContent=tasks.length;
     $('today').textContent=tasks.filter(t=>t.due===localDate()&&t.status!=='done').length;
     $('blocked').textContent=tasks.filter(t=>t.status==='blocked').length;
     $('done').textContent=tasks.filter(t=>t.status==='done').length;
-    const ownerTasks=tasks.filter(t=>!project||t.project===project).sort(sortTasks);
-    $('ownerTasks').innerHTML=ownerTasks.length?ownerTasks.map(t=>taskHtml(t,'owner')).join(''):'<div class="empty">No hay entregables en este proyecto. Crea uno nuevo para empezar.</div>';
-    const blocked=tasks.filter(t=>t.status==='blocked').sort(sortTasks);
-    $('attention').innerHTML=blocked.length?blocked.map(t=>`<article class="item"><span class="pill blocked">Requiere apoyo</span><div class="item-title" style="margin-top:11px">${esc(t.title)}</div><div class="meta">${esc(t.project)} · ${esc(t.owner)}</div><div class="note">${esc(t.notes||'Sin detalle del bloqueo.')}</div><div class="actions"><button type="button" class="mini primary" data-action="open" data-id="${t.id}">Marcar resuelto</button></div></article>`).join(''):'<div class="empty">Sin bloqueos reportados. ✨</div>';
+    $('overdue').textContent=tasks.filter(isOverdue).length;
+    const ownerTasks=tasks.filter(t=>(!project||t.project===project)&&(
+      risk==='all'||risk==='overdue'&&isOverdue(t)||risk==='blocked'&&t.status==='blocked'||risk==='active'&&t.status!=='done'&&t.status!=='blocked'
+    )).sort(sortTasks);
+    $('ownerTasks').innerHTML=ownerTasks.length?ownerTasks.map(t=>taskHtml(t,'owner')).join(''):'<div class="empty">No hay entregables con este filtro.</div>';
+    const urgent=tasks.filter(t=>t.status==='blocked'||isOverdue(t)).sort((a,b)=>(a.status!=='blocked')-(b.status!=='blocked')||sortTasks(a,b));
+    $('attention').innerHTML=urgent.length?urgent.map(t=>`<article class="item"><div class="line"><span class="pill ${t.status==='blocked'?'blocked':'overdue'}">${t.status==='blocked'?'Bloqueo pendiente':'Fecha vencida'}</span>${dateTag(t)}</div><div class="item-title" style="margin-top:11px">${esc(t.title)}</div><div class="meta">${esc(t.project)} · ${esc(t.owner)}</div>
+      <div class="note">${t.status==='blocked'?esc(blockerReason(t)): `Compromiso: ${esc(t.due)} · Reprogramar en «Editar».`}</div>
+      ${t.status==='blocked'&&t.blockerRequest?`<div class="note"><strong>Necesita:</strong> ${esc(t.blockerRequest)}</div>`:''}
+      <div class="actions"><button type="button" class="mini primary" data-action="${t.status==='blocked'?'decide':'edit'}" data-id="${t.id}">${t.status==='blocked'?'Registrar decisión':'Reprogramar'}</button></div></article>`).join(''):'<div class="empty">Sin bloqueos ni atrasos pendientes. ✨</div>';
     const mine=tasks.filter(t=>t.owner===employee);
     $('employeeDone').textContent=mine.filter(t=>t.status==='done').length;
     $('employeeBlocked').textContent=mine.filter(t=>t.status==='blocked').length;
     const [mon,sun]=weekBounds();
-    const visible=mine.filter(t=>period==='all'||(period==='today'?t.due===localDate():t.due>=mon&&t.due<=sun)).sort(sortTasks);
-    $('employeeTasks').innerHTML=!employee?'<div class="empty">El dueño debe crear primero un entregable y asignarle un responsable.</div>':visible.length?visible.map(t=>taskHtml(t,'employee')).join(''):`<div class="empty">No tienes entregables para ${period==='today'?'hoy':period==='week'?'esta semana':'este período'}. Prueba con «Todos».</div>`;
+    const visible=mine.filter(t=>period==='all'||period==='today'&&t.due===localDate()||period==='week'&&t.due>=mon&&t.due<=sun).sort(sortTasks);
+    $('employeeTasks').innerHTML=!employee?'<div class="empty">Crea primero un entregable desde Vista general y asigna un responsable.</div>':visible.length?visible.map(t=>taskHtml(t,'employee')).join(''):`<div class="empty">No hay entregables para ${period==='today'?'hoy':period==='week'?'esta semana':'este período'}. Prueba con «Todos».</div>`;
   }
-  function setStatus(id,status) { const t=tasks.find(x=>x.id===id); if(!t)return; t.status=status; save(); render(); }
-  function newId() { const max=tasks.reduce((m,t)=>Math.max(m,t.id),0); return max<Number.MAX_SAFE_INTEGER?max+1:Date.now(); }
+  function newId() {const max=tasks.reduce((m,t)=>Math.max(m,t.id),0);return max<Number.MAX_SAFE_INTEGER?max+1:Date.now();}
+  function changeStatus(id,status) {
+    const t=taskById(id);if(!t)return;
+    t.status=status;
+    if(status==='done'){t.progress=100;log(t,'Entregable terminado');}
+    else if(status==='open'){t.progress=0;log(t,'Entregable reabierto');}
+    save();render();
+  }
+  function openEditor(id=null) {
+    editingId=id;const t=id===null?null:taskById(id);$('taskform').reset();
+    $('editorHeading').textContent=t?'Editar entregable':'Nuevo entregable';$('saveTask').textContent=t?'Guardar cambios':'Crear entregable';
+    $('taskTitle').value=t?.title||'';$('taskOwner').value=t?.owner||'';$('taskProject').value=t?.project||'';
+    $('taskDue').value=t?.due||localDate();$('taskNotes').value=t?.notes||'';$('taskPriority').value=t?priority(t):'normal';
+    $('editor').showModal();
+  }
+  function openProgress(id) {
+    const t=taskById(id);if(!t||t.status==='done')return;
+    progressId=id;$('progressTask').textContent=t.title;$('progressPercent').value=String(progress(t));$('progressLabel').textContent=progress(t)+'%';$('progressNote').value='';$('progressDialog').showModal();
+  }
+  function openBlocker(id) {
+    const t=taskById(id);if(!t)return;
+    blockingId=id;$('blockerTask').textContent=t.title;
+    $('blockerReason').value=t.status==='blocked'?blockerReason(t):'';$('blockerRequest').value=t.blockerRequest||'';$('blockerDialog').showModal();
+  }
+  function openDecision(id) {
+    const t=taskById(id);if(!t||t.status!=='blocked')return;
+    decisionId=id;$('decisionTask').textContent=t.title;
+    $('decisionContext').textContent=`Bloqueo: ${blockerReason(t)}${t.blockerRequest?' · Necesita: '+t.blockerRequest:''}`;
+    $('decisionText').value='';$('decisionDue').value='';$('decisionDialog').showModal();
+  }
   function doAction(action,id) {
-    const t=tasks.find(x=>x.id===id); if(!t)return;
-    if(action==='done')return setStatus(id,'done');
-    if(action==='open')return setStatus(id,'open');
-    if(action==='block') { blockingTaskId=id; $('blockerTask').textContent=t.title; $('blockerReason').value=t.notes||''; $('blockerDialog').showModal(); return; }
-    if(action==='delete'&&view==='owner'&&confirm('¿Eliminar este entregable?')) {tasks=tasks.filter(x=>x.id!==id); save(); render();}
+    const t=taskById(id);if(!t)return;
+    if(action==='done')return changeStatus(id,'done');
+    if(action==='open')return changeStatus(id,'open');
+    if(action==='progress')return openProgress(id);
+    if(action==='block')return openBlocker(id);
+    if(action==='decide'&&view==='owner')return openDecision(id);
+    if(action==='edit'&&view==='owner')return openEditor(id);
+    if(action==='delete'&&view==='owner'&&confirm('¿Eliminar este entregable?')){tasks=tasks.filter(x=>x.id!==id);save();render();}
   }
-  document.addEventListener('click',event=>{
-    const btn=event.target.closest('button'); if(!btn)return;
+  document.addEventListener('click',e=>{
+    const btn=e.target.closest('button');if(!btn)return;
     if(btn.dataset.view){view=btn.dataset.view;store(VIEW_KEY,view);render();}
     else if(btn.dataset.period){period=btn.dataset.period;render();}
     else if(btn.dataset.action){const id=Number(btn.dataset.id);if(Number.isSafeInteger(id))doAction(btn.dataset.action,id);}
     else if(btn.dataset.close){$(btn.dataset.close).close();}
   });
-  $('employeeSelect').addEventListener('change',event=>{employee=event.target.value;store(PERSON_KEY,employee);render();});
-  $('projectFilter').addEventListener('change',event=>{project=event.target.value;render();});
-  $('newTask').addEventListener('click',()=>{ $('taskform').reset(); $('taskDue').value=localDate(); $('editor').showModal(); });
-  $('taskform').addEventListener('submit',event=>{
-    event.preventDefault();
-    const data=Object.fromEntries(new FormData(event.target));
-    const title=String(data.title||'').trim(),owner=String(data.owner||'').trim(),p=String(data.project||'').trim(),due=String(data.due||'');
-    if(!title||!owner||!p||!/^\d{4}-\d{2}-\d{2}$/.test(due))return;
-    tasks.push({id:newId(),title,owner,project:p,due,notes:String(data.notes||'').trim(),status:'open'});
-    project=''; save(); render(); $('editor').close();
+  $('employeeSelect').addEventListener('change',e=>{employee=e.target.value;store(PERSON_KEY,employee);render();});
+  $('projectFilter').addEventListener('change',e=>{project=e.target.value;render();});
+  $('riskFilter').addEventListener('change',e=>{risk=e.target.value;render();});
+  $('newTask').addEventListener('click',()=>openEditor());
+  $('progressPercent').addEventListener('input',()=>{$('progressLabel').textContent=$('progressPercent').value+'%';});
+  $('taskform').addEventListener('submit',e=>{
+    e.preventDefault();const d=Object.fromEntries(new FormData(e.target));
+    const title=String(d.title||'').trim(),owner=String(d.owner||'').trim(),p=String(d.project||'').trim(),due=String(d.due||''),pr=String(d.priority||'normal');
+    if(!title||!owner||!p||!/^\d{4}-\d{2}-\d{2}$/.test(due)||!['normal','high','low'].includes(pr))return;
+    if(editingId!==null){
+      const t=taskById(editingId);if(!t)return;
+      const oldDue=t.due;t.title=title;t.owner=owner;t.project=p;t.due=due;t.notes=String(d.notes||'').trim();t.priority=pr;
+      log(t,'Plan actualizado',oldDue!==due?`Nueva fecha: ${due}`:'Datos de entrega actualizados');
+    }else{
+      const t={id:newId(),title,owner,project:p,due,notes:String(d.notes||'').trim(),priority:pr,status:'open',progress:0,history:[]};
+      log(t,'Entregable creado');tasks.push(t);
+    }
+    project='';risk='all';save();render();$('editor').close();editingId=null;
   });
-  $('blockerForm').addEventListener('submit',event=>{
-    event.preventDefault();const t=tasks.find(x=>x.id===blockingTaskId);
-    const reason=$('blockerReason').value.trim(); if(!t||!reason)return;
-    t.status='blocked';t.notes=reason; save();render();$('blockerDialog').close();blockingTaskId=null;
+  $('progressForm').addEventListener('submit',e=>{
+    e.preventDefault();const t=taskById(progressId),n=Number($('progressPercent').value),note=$('progressNote').value.trim();
+    if(!t||!Number.isInteger(n)||n<0||n>100||n%10!==0||!note)return;
+    t.progress=n;if(t.status!=='blocked')t.status=n===100?'done':n>0?'in_progress':'open';
+    log(t,n===100&&t.status==='done'?'Avance completado':'Avance registrado',`${n}% · ${note}`);
+    save();render();$('progressDialog').close();progressId=null;
   });
-  // Other tabs of the same browser refresh when tasks change.
-  window.addEventListener('storage',event=>{if(event.key!==KEY)return;try{const next=JSON.parse(event.newValue||'[]');tasks=Array.isArray(next)?next.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[];render();}catch{toast('No se pudieron actualizar los datos desde otra pestaña.');}});
-  load(); render();
+  $('blockerForm').addEventListener('submit',e=>{
+    e.preventDefault();const t=taskById(blockingId),reason=$('blockerReason').value.trim();
+    if(!t||!reason)return;
+    t.blockerReason=reason;t.blockerRequest=$('blockerRequest').value.trim();t.blockedAt=stamp();t.status='blocked';
+    log(t,'Bloqueo reportado',reason+(t.blockerRequest?' · Se necesita: '+t.blockerRequest:''));
+    save();render();$('blockerDialog').close();blockingId=null;
+  });
+  $('decisionForm').addEventListener('submit',e=>{
+    e.preventDefault();const t=taskById(decisionId),decision=$('decisionText').value.trim(),due=$('decisionDue').value;
+    if(!t||t.status!=='blocked'||!decision||due&&!/^\d{4}-\d{2}-\d{2}$/.test(due))return;
+    t.lastDecision=decision;t.status=progress(t)>0?'in_progress':'open';
+    t.blockerReason='';t.blockerRequest='';t.blockedAt=null;
+    if(due)t.due=due;
+    log(t,'Decisión registrada',decision+(due?' · Nueva fecha: '+due:''));
+    save();render();$('decisionDialog').close();decisionId=null;
+  });
+  window.addEventListener('storage',e=>{if(e.key!==KEY)return;try{const v=JSON.parse(e.newValue||'[]');tasks=Array.isArray(v)?v.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[];render();}catch{toast('No se pudieron actualizar los datos desde otra pestaña.');}});
+  load();render();
 </script>
 </body>
 </html>
