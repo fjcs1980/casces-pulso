@@ -184,7 +184,7 @@
           <div class="employee-summary"><strong id="employeeBlocked">0</strong><span>bloqueos pendientes</span></div>
           <div style="height:1px;background:#ecf0f6;margin:21px 0"></div>
           <div class="side-label">Comunicación simple</div>
-          <div class="info-box"><p><strong>¿Algo impide continuar?</strong> Abre el entregable y usa «Reportar bloqueo». El motivo aparecerá en Vista general de este navegador, donde se podrá registrar una decisión. Tus acciones alimentan la línea de tiempo automáticamente.</p></div>
+          <div class="info-box"><p><strong>¿Algo impide continuar?</strong> Abre el entregable y usa «Reportar bloqueo». El motivo aparecerá en Vista general de este navegador, donde se podrá registrar una decisión. Cuando el impedimento desaparezca, puedes indicar «Ya puedo continuar» desde Mi trabajo. Tus acciones alimentan la línea de tiempo automáticamente.</p></div>
         </aside>
       </div>
     </div>
@@ -223,7 +223,7 @@
     <input id="progressPercent" type="range" min="0" max="100" step="10" value="0">
     <label class="field" for="progressNote">¿Qué cambió?</label>
     <textarea id="progressNote" required maxlength="300" placeholder="Ej. Instalamos las cámaras; faltan las pruebas."></textarea>
-    <p class="notice">Al llegar al 100%, el entregable se marcará terminado. Un bloqueo reportado se mantiene hasta registrar la decisión.</p>
+    <p class="notice">Al llegar al 100%, el entregable se marcará terminado. Un bloqueo se mantiene hasta registrar una decisión o confirmar que ya puedes continuar.</p>
     <div class="dialog-actions"><button type="button" class="btn secondary" data-close="progressDialog">Cancelar</button><button class="btn" type="submit">Guardar avance</button></div>
   </form>
 </dialog>
@@ -238,6 +238,16 @@
     <div class="dialog-actions"><button type="button" class="btn secondary" data-close="decisionDialog">Cancelar</button><button class="btn" type="submit">Guardar y desbloquear</button></div>
   </form>
 </dialog>
+
+<dialog id="selfResolveDialog">
+  <form id="selfResolveForm">
+    <h2>¿Ya puedes continuar?</h2><p id="selfResolveTask" class="dialog-sub"></p>
+    <label class="field" for="selfResolveNote">¿Qué cambió? (opcional)</label>
+    <textarea id="selfResolveNote" maxlength="300" placeholder="Ej. El cliente confirmó el acceso."></textarea>
+    <p class="notice">Pulso registrará que se resolvió el bloqueo. Tu comentario quedará en el historial del entregable, no en la línea de tiempo general.</p>
+    <div class="dialog-actions"><button type="button" class="btn secondary" data-close="selfResolveDialog">Cancelar</button><button class="btn" type="submit">Confirmar y continuar</button></div>
+  </form>
+</dialog>
 <div id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
@@ -249,7 +259,7 @@
   const $ = id => document.getElementById(id);
   let tasks = [];
   let view = 'owner', period = 'today', employee = '', project = '', risk = 'all';
-  let editingId = null, blockingId = null, progressId = null, decisionId = null;
+  let editingId = null, blockingId = null, progressId = null, decisionId = null, selfResolveId = null;
 
   function getStored(key) { try { return localStorage.getItem(key); } catch { return null; } }
   function store(key, val) { try { localStorage.setItem(key, val); return true; } catch { toast('No se pudo guardar en este navegador.'); return false; } }
@@ -346,6 +356,7 @@
     if(t.status==='done')actions.push(`<button type="button" class="mini" data-action="open" data-id="${t.id}">Reabrir</button>`);
     else if(t.status==='blocked'){
       if(mode==='owner')actions.push(`<button type="button" class="mini primary" data-action="decide" data-id="${t.id}">Registrar decisión</button>`);
+      if(mode==='employee')actions.push(`<button type="button" class="mini primary" data-action="resume" data-id="${t.id}">Ya puedo continuar</button>`);
       actions.push(`<button type="button" class="mini" data-action="block" data-id="${t.id}">Actualizar bloqueo</button>`);
     }else{
       actions.push(`<button type="button" class="mini primary" data-action="progress" data-id="${t.id}">+ Registrar avance</button>`);
@@ -434,6 +445,13 @@
     $('decisionContext').textContent=`Bloqueo: ${blockerReason(t)}${t.blockerRequest?' · Necesita: '+t.blockerRequest:''}`;
     $('decisionText').value='';$('decisionDue').value='';$('decisionDialog').showModal();
   }
+  function openSelfResolve(id) {
+    const t=taskById(id);if(!t||t.status!=='blocked'||t.owner!==employee)return;
+    selfResolveId=id;
+    $('selfResolveTask').textContent=t.title;
+    $('selfResolveNote').value='';
+    $('selfResolveDialog').showModal();
+  }
   function doAction(action,id) {
     const t=taskById(id);if(!t)return;
     if(action==='done')return changeStatus(id,'done');
@@ -441,6 +459,7 @@
     if(action==='progress')return openProgress(id);
     if(action==='block')return openBlocker(id);
     if(action==='decide'&&view==='owner')return openDecision(id);
+    if(action==='resume'&&view==='employee')return openSelfResolve(id);
     if(action==='edit'&&view==='owner')return openEditor(id);
     if(action==='delete'&&view==='owner'&&confirm('¿Eliminar este entregable?')){tasks=tasks.filter(x=>x.id!==id);save();render();}
   }
@@ -494,6 +513,16 @@
     if(due)t.due=due;
     log(t,'Decisión registrada',decision+(due?' · Nueva fecha: '+due:''),'blocker_resolved');
     save();render();$('decisionDialog').close();decisionId=null;
+  });
+  $('selfResolveForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const t=taskById(selfResolveId);
+    if(!t||t.status!=='blocked'||t.owner!==employee)return;
+    const note=$('selfResolveNote').value.trim();
+    t.status=progress(t)>0?'in_progress':'open';
+    t.blockerReason='';t.blockerRequest='';t.blockedAt=null;
+    log(t,'Bloqueo resuelto desde Mi trabajo',note,'blocker_resolved');
+    save();render();$('selfResolveDialog').close();selfResolveId=null;
   });
   window.addEventListener('storage',e=>{if(e.key!==KEY)return;try{const v=JSON.parse(e.newValue||'[]');tasks=Array.isArray(v)?v.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[];render();}catch{toast('No se pudieron actualizar los datos desde otra pestaña.');}});
   load();render();
