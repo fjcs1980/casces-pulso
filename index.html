@@ -1,1 +1,304 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pulso — CasCes</title><style>:root{font-family:Inter,system-ui,sans-serif;color:#182334;background:#f4f6fa}*{box-sizing:border-box}body{margin:0}.shell{max-width:1120px;margin:auto;padding:30px 20px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.brand{font-size:23px;font-weight:800;letter-spacing:-1px}.brand span{color:#5c63e9}.tag{font-size:12px;color:#64748b}h1{font-size:32px;margin:0 0 6px}p{color:#64748b;margin:0}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}.btn{border:0;border-radius:11px;padding:12px 16px;background:#545ce4;color:white;font-weight:700;cursor:pointer}.btn.secondary{background:white;color:#293449;border:1px solid #dce2ed}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.stat,.panel{background:white;border:1px solid #e4e8f1;border-radius:16px;padding:19px}.stat strong{font-size:30px;display:block;margin-top:7px}.stat small{color:#64748b}.layout{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}.panel h2{font-size:17px;margin:0 0 16px}.item{border:1px solid #e9edf4;border-radius:12px;padding:14px;margin-bottom:10px}.item .line{display:flex;justify-content:space-between;gap:10px}.item strong{font-size:14px}.meta{font-size:12px;color:#64748b;margin-top:7px}.pill{font-size:11px;padding:4px 8px;border-radius:99px;white-space:nowrap;background:#e9edff;color:#414ac6}.pill.blocked{background:#fff0e9;color:#b84d21}.pill.done{background:#e4f7ed;color:#16764a}.actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}button.mini{border:1px solid #dce2ed;background:white;padding:7px 9px;border-radius:8px;font-size:12px;cursor:pointer}.empty{padding:25px;text-align:center;color:#8792a4;font-size:13px}dialog{border:0;border-radius:18px;box-shadow:0 20px 80px #16244b35;width:min(480px,94vw);padding:24px}dialog::backdrop{background:#15213c77}label{display:block;font-size:12px;font-weight:700;margin:12px 0 5px}input,select,textarea{width:100%;border:1px solid #dce2ed;border-radius:9px;padding:10px;font:inherit}textarea{min-height:75px}.foot{font-size:12px;color:#8792a4;margin-top:22px}@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}h1{font-size:26px}}</style></head><body><div class="shell"><header><div class="brand">pulso<span>.</span> <span class="tag">by CasCes</span></div><div class="tag">Demo local · Sin cuenta</div></header><section class="top"><div><h1>Tu equipo, en sincronía.</h1><p>Entregables claros. Bloqueos visibles. Decisiones a tiempo.</p></div><button class="btn" onclick="showDialog()">+ Nuevo entregable</button></section><section class="stats"><div class="stat"><small>Entregables</small><strong id="total">0</strong></div><div class="stat"><small>Para hoy</small><strong id="today">0</strong></div><div class="stat"><small>Bloqueados</small><strong id="blocked">0</strong></div><div class="stat"><small>Terminados</small><strong id="done">0</strong></div></section><div class="layout"><section class="panel"><h2>Plan de trabajo</h2><div id="tasks"></div></section><section class="panel"><h2>Necesitan tu atención</h2><div id="attention"></div></section></div><p class="foot">Prototipo funcional local. La información se almacena únicamente en este navegador (localStorage). No usar para datos sensibles ni como servicio productivo.</p></div><dialog id="editor"><form id="taskform"><h2 style="margin:0">Nuevo entregable</h2><label>Entregable</label><input name="title" required maxlength="120" placeholder="Ej. Confirmar acceso a instalaciones"><label>Responsable</label><input name="owner" required maxlength="70" placeholder="Ej. Ana"><label>Proyecto</label><input name="project" required maxlength="90" placeholder="Ej. Instalación CCTV"><label>Fecha compromiso</label><input name="due" type="date" required><label>Notas (opcional)</label><textarea name="notes" maxlength="500"></textarea><div style="display:flex;justify-content:flex-end;gap:9px;margin-top:20px"><button type="button" class="btn secondary" onclick="editor.close()">Cancelar</button><button class="btn">Guardar</button></div></form></dialog><script>const KEY='casces_pulso_v1';let tasks=[];try{tasks=JSON.parse(localStorage.getItem(KEY))||[]}catch{};if(!tasks.length){const d=new Date(),date=n=>{const x=new Date(d);x.setDate(x.getDate()+n);return x.toLocaleDateString('en-CA')};tasks=[{id:1,title:'Confirmar llegada de cámaras',owner:'Ana',project:'Instalación CCTV · Cliente Norte',due:date(0),status:'open',notes:''},{id:2,title:'Validar acceso al cuarto de servidores',owner:'Luis',project:'Instalación CCTV · Cliente Norte',due:date(0),status:'blocked',notes:'El cliente todavía no confirma el acceso'},{id:3,title:'Entregar checklist de pruebas',owner:'María',project:'Control de acceso · Oficina Centro',due:date(2),status:'open',notes:''}];save()}function save(){localStorage.setItem(KEY,JSON.stringify(tasks))}function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function today(){return new Date().toLocaleDateString('en-CA')}function render(){document.getElementById('total').textContent=tasks.length;document.getElementById('today').textContent=tasks.filter(t=>t.due===today()&&t.status!=='done').length;document.getElementById('blocked').textContent=tasks.filter(t=>t.status==='blocked').length;document.getElementById('done').textContent=tasks.filter(t=>t.status==='done').length;const sorted=[...tasks].sort((a,b)=>(a.status==='done')-(b.status==='done')||a.due.localeCompare(b.due));document.getElementById('tasks').innerHTML=sorted.length?sorted.map(t=>`<article class="item"><div class="line"><strong>${esc(t.title)}</strong><span class="pill ${t.status}">${t.status==='blocked'?'Bloqueado':t.status==='done'?'Terminado':'En curso'}</span></div><div class="meta">${esc(t.project)} · ${esc(t.owner)} · ${esc(t.due)}</div>${t.notes?`<div class="meta">${esc(t.notes)}</div>`:''}<div class="actions">${t.status!=='done'?`<button class="mini" onclick="setStatus(${t.id},'done')">✓ Terminar</button>`:''}${t.status!=='blocked'&&t.status!=='done'?`<button class="mini" onclick="block(${t.id})">⚑ Reportar bloqueo</button>`:''}${t.status==='blocked'?`<button class="mini" onclick="setStatus(${t.id},'open')">Resolver bloqueo</button>`:''}<button class="mini" onclick="removeTask(${t.id})">Eliminar</button></div></article>`).join(''):'<div class="empty">Agrega tu primer entregable.</div>';const blocked=tasks.filter(t=>t.status==='blocked');document.getElementById('attention').innerHTML=blocked.length?blocked.map(t=>`<article class="item"><span class="pill blocked">Requiere apoyo</span><p style="margin:12px 0 5px;color:#182334;font-weight:700">${esc(t.title)}</p><div class="meta">${esc(t.project)} · ${esc(t.owner)}</div><p style="font-size:13px;margin-top:10px">${esc(t.notes||'Solicitar detalle del bloqueo al responsable.')}</p><div class="actions"><button class="mini" onclick="setStatus(${t.id},'open')">Marcar resuelto</button></div></article>`).join(''):'<div class="empty">Sin bloqueos reportados. ✨</div>'}function setStatus(id,status){const t=tasks.find(x=>x.id===id);if(t){t.status=status;save();render()}}function block(id){const t=tasks.find(x=>x.id===id);if(!t)return;const reason=prompt('¿Qué impide avanzar?',t.notes||'');if(reason===null)return;t.status='blocked';t.notes=reason.trim();save();render()}function removeTask(id){if(confirm('¿Eliminar este entregable?')){tasks=tasks.filter(x=>x.id!==id);save();render()}}function showDialog(){document.getElementById('editor').showModal()}document.getElementById('taskform').addEventListener('submit',e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));tasks.push({...d,id:Date.now(),status:'open'});save();render();e.target.reset();document.getElementById('editor').close()});render();</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Pulso — CasCes</title>
+  <style>
+    :root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#17243a;background:#f5f7fb;font-synthesis:none}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #a7adfa;outline-offset:2px}
+    .shell{max-width:1180px;margin:auto;padding:28px 24px 36px}
+    .app-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:25px;border-bottom:1px solid #e5eaf2}
+    .brand{font-size:26px;line-height:1;font-weight:830;letter-spacing:-1.35px;color:#16243d}
+    .brand .dot{color:#575fe6}.brand .by{font-size:11px;color:#8994a6;font-weight:650;letter-spacing:0;margin-left:7px}
+    .demo{display:inline-flex;align-items:center;gap:8px;color:#6e7d91;font-size:12px}
+    .demo::before{content:"";width:7px;height:7px;border-radius:50%;background:#8e98eb}
+    .switcher-wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:27px 0 25px}
+    .eyebrow{font-size:11px;font-weight:800;letter-spacing:.11em;color:#6573a0;text-transform:uppercase}
+    .role-switch{display:inline-flex;gap:5px;padding:5px;background:#e9edf6;border-radius:14px}
+    .role{border:0;border-radius:10px;background:transparent;color:#607087;font-weight:700;font-size:13px;padding:11px 18px;min-width:112px}
+    .role[aria-pressed="true"]{background:#fff;color:#3a43b9;box-shadow:0 2px 10px #15265e12}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:23px}
+    h1{font-size:clamp(25px,3vw,34px);font-weight:790;letter-spacing:-1px;line-height:1.12;margin:6px 0 9px}
+    .lead{margin:0;color:#6d7b91;font-size:14px;line-height:1.55}
+    .btn{border:1px solid #555de4;background:#545ce4;color:white;border-radius:11px;font-weight:720;padding:12px 16px;font-size:13px;min-height:43px;box-shadow:0 5px 14px #545ce422}
+    .btn:hover{background:#454cc8}.btn.secondary{background:#fff;border-color:#dee5ef;color:#3d4a61;box-shadow:none}.btn.secondary:hover{background:#f6f8fc}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:0 0 19px}
+    .stat,.panel,.employee-intro{background:#fff;border:1px solid #e5eaf3;border-radius:17px;box-shadow:0 3px 12px #1d345405}
+    .stat{padding:20px 20px 19px}.stat small{color:#738096;font-size:12px;font-weight:650}.stat strong{display:block;color:#17243a;font-size:30px;font-weight:780;letter-spacing:-1px;margin-top:9px}
+    .stat.alert strong{color:#c96e3b}.stat.complete strong{color:#26976e}
+    .layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:16px}
+    .panel{padding:21px;min-width:0}.panel-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:17px}.panel h2{font-size:17px;letter-spacing:-.3px;margin:0;font-weight:760}
+    .hint{color:#8a95a7;font-size:12px}.hint strong{color:#69788e}
+    .select{background:#fff;border:1px solid #dfe5f0;border-radius:10px;padding:9px 33px 9px 11px;color:#3d4b62;font-size:13px;max-width:100%;min-height:39px}
+    .item{border:1px solid #e9edf4;background:#fff;border-radius:13px;padding:16px;margin-bottom:10px}
+    .item:last-child{margin-bottom:0}.item .line{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .item-title{font-size:14px;line-height:1.43;font-weight:750;color:#263349;min-width:0;overflow-wrap:anywhere}
+    .meta{font-size:12px;color:#7a8799;margin-top:8px;line-height:1.5;overflow-wrap:anywhere}
+    .note{font-size:12px;color:#52617a;line-height:1.5;margin-top:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+    .pill{font-size:11px;padding:5px 9px;border-radius:99px;white-space:nowrap;background:#eaedff;color:#434dcc;font-weight:700}
+    .pill.blocked{background:#fff0e8;color:#bc552a}.pill.done{background:#e7f8ef;color:#177a52}
+    .pill.overdue{background:#fff1ec;color:#c05c3b}.pill.due{background:#edf2ff;color:#4b59bf}
+    .actions{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
+    .mini{border:1px solid #dfe5ef;background:white;padding:8px 10px;border-radius:9px;font-size:12px;color:#48566e;font-weight:650}
+    .mini:hover{background:#f7f8fc;border-color:#bfc8dc}.mini.primary{color:#434bc0;border-color:#cbd0fd;background:#f7f7ff}.mini.danger{color:#aa6870}
+    .empty{padding:30px 15px;text-align:center;color:#8a96a7;font-size:13px;line-height:1.6}
+    .employee-intro{padding:20px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+    .employee-intro p{font-size:12px;color:#7a879a;line-height:1.5;margin:6px 0 0}
+    .employee-choice{min-width:200px;max-width:100%}.employee-choice label{display:block;margin:0 0 7px;font-size:11px;color:#718095;font-weight:750}
+    .employee-choice select{width:100%}
+    .employee-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(260px,.85fr);gap:16px}
+    .tabs{display:inline-flex;gap:5px;background:#f0f3f9;padding:4px;border-radius:11px;flex-wrap:wrap}
+    .tab{background:transparent;border:0;border-radius:8px;padding:8px 11px;font-size:12px;color:#718095;font-weight:700}
+    .tab[aria-pressed="true"]{background:#fff;color:#4e55d1;box-shadow:0 1px 5px #1f326b13}
+    .side-label{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:730;color:#35445e;margin-bottom:12px}.side-label::before{content:"";width:7px;height:7px;background:#5d66e7;border-radius:50%}
+    .info-box{border-radius:12px;background:#f7f8fd;padding:15px;color:#67758c;font-size:12px;line-height:1.65}
+    .info-box strong{color:#2e3c57}.info-box p{margin:0}
+    .employee-summary{display:flex;gap:10px;align-items:baseline;color:#66758b;font-size:12px;margin-top:13px}.employee-summary strong{font-size:29px;letter-spacing:-1px;color:#202d45}
+    .foot{font-size:11px;line-height:1.65;color:#919cae;margin-top:24px}
+    .view[hidden]{display:none!important}
+    dialog{border:0;border-radius:20px;box-shadow:0 25px 85px #101c4845;width:min(480px,94vw);padding:25px;color:#17243a}
+    dialog::backdrop{background:#14234779}
+    dialog h2{margin:0 0 8px;font-size:21px;letter-spacing:-.5px}dialog .dialog-sub{color:#7b8899;font-size:13px;line-height:1.45;margin:0 0 17px}
+    .field{display:block;font-size:12px;font-weight:720;color:#42506b;margin:13px 0 6px}
+    input,textarea,dialog select{width:100%;border:1px solid #dfe5f0;border-radius:10px;padding:11px;font-size:14px;color:#25334b;background:#fff}
+    textarea{min-height:90px;resize:vertical}
+    .dialog-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:19px}
+    .notice{margin-top:15px;color:#76859a;font-size:11px;line-height:1.5}
+    #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#263650;color:#fff;border-radius:10px;padding:11px 17px;font-size:12px;box-shadow:0 8px 24px #18284330;z-index:20;max-width:min(90vw,420px);text-align:center}
+    #toast[hidden]{display:none}
+    @media(max-width:820px){.layout,.employee-layout{grid-template-columns:1fr}.shell{padding:22px 16px 30px}}
+    @media(max-width:620px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:17px}.stat strong{font-size:26px}.panel{padding:17px}.switcher-wrap{align-items:stretch}.role-switch{width:100%}.role{flex:1;min-width:0}.top .btn{width:100%}.panel-header{align-items:flex-start}.app-header{padding-bottom:20px}.employee-intro{align-items:stretch}.employee-choice{width:100%}.item .line{align-items:flex-start}.brand{font-size:24px}}
+    @media(prefers-reduced-motion:no-preference){button{transition:background .15s,border-color .15s}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="app-header">
+    <div class="brand">pulso<span class="dot">.</span><span class="by">by CasCes</span></div>
+    <div class="demo">Prototipo local</div>
+  </header>
+
+  <section class="switcher-wrap" aria-label="Selector de vista">
+    <span class="eyebrow">Espacio de trabajo</span>
+    <div class="role-switch" role="group" aria-label="Vista del prototipo">
+      <button id="ownerTab" class="role" type="button" data-view="owner" aria-pressed="true">Dueño</button>
+      <button id="employeeTab" class="role" type="button" data-view="employee" aria-pressed="false">Empleado</button>
+    </div>
+  </section>
+
+  <main>
+    <div class="view" id="ownerView">
+      <div class="top">
+        <div><div class="eyebrow">Panel general</div><h1>Tu equipo, en sincronía.</h1><p class="lead">Entregables claros. Bloqueos visibles. Decisiones a tiempo.</p></div>
+        <button class="btn" type="button" id="newTask">+ Nuevo entregable</button>
+      </div>
+      <section class="stats" aria-label="Indicadores de proyectos">
+        <div class="stat"><small>Entregables</small><strong id="total">0</strong></div>
+        <div class="stat"><small>Para hoy</small><strong id="today">0</strong></div>
+        <div class="stat alert"><small>Bloqueados</small><strong id="blocked">0</strong></div>
+        <div class="stat complete"><small>Terminados</small><strong id="done">0</strong></div>
+      </section>
+      <div class="layout">
+        <section class="panel" aria-label="Plan de trabajo">
+          <div class="panel-header"><div><h2>Plan de trabajo</h2><span class="hint" id="projectCount"></span></div><select id="projectFilter" class="select" aria-label="Filtrar por proyecto"><option value="">Todos los proyectos</option></select></div>
+          <div id="ownerTasks"></div>
+        </section>
+        <section class="panel" aria-label="Bloqueos y decisiones">
+          <div class="panel-header"><h2>Necesitan tu atención</h2><span class="hint">Bloqueos por resolver</span></div>
+          <div id="attention"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="view" id="employeeView" hidden>
+      <div class="top">
+        <div><div class="eyebrow">Mi jornada</div><h1>Lo importante, a la vista.</h1><p class="lead">Consulta tus entregables, reporta avances y avisa si algo te detiene.</p></div>
+      </div>
+      <div class="employee-intro">
+        <div><strong style="font-size:14px">¿Qué responsable quieres consultar?</strong><p>Selección de demostración: no verifica la identidad de nadie.</p></div>
+        <div class="employee-choice"><label for="employeeSelect">Responsable</label><select id="employeeSelect" class="select"></select></div>
+      </div>
+      <div class="employee-layout">
+        <section class="panel" aria-label="Mis entregables">
+          <div class="panel-header"><h2>Mis entregables</h2><div class="tabs" role="group" aria-label="Período">
+            <button class="tab" type="button" data-period="today" aria-pressed="true">Hoy</button>
+            <button class="tab" type="button" data-period="week" aria-pressed="false">Esta semana</button>
+            <button class="tab" type="button" data-period="all" aria-pressed="false">Todos</button>
+          </div></div>
+          <div id="employeeTasks"></div>
+        </section>
+        <aside class="panel" aria-label="Mi avance">
+          <h2>Mi avance</h2>
+          <div class="employee-summary"><strong id="employeeDone">0</strong><span>entregables terminados</span></div>
+          <div class="employee-summary"><strong id="employeeBlocked">0</strong><span>bloqueos pendientes</span></div>
+          <div style="height:1px;background:#ecf0f6;margin:21px 0"></div>
+          <div class="side-label">Comunicación simple</div>
+          <div class="info-box"><p><strong>¿Algo impide continuar?</strong> Abre el entregable y usa «Reportar bloqueo». El motivo aparecerá de inmediato en la vista Dueño de este navegador.</p></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <p class="foot">Demo sin cuentas ni permisos reales. Ambas vistas usan los mismos datos de este navegador (localStorage), no comparten información entre dispositivos. No utilizar con datos sensibles ni para operación productiva.</p>
+</div>
+
+<dialog id="editor">
+  <form id="taskform">
+    <h2>Nuevo entregable</h2><p class="dialog-sub">Define el trabajo y el responsable.</p>
+    <label class="field" for="taskTitle">Entregable</label><input id="taskTitle" name="title" required maxlength="120" placeholder="Ej. Confirmar acceso a instalaciones">
+    <label class="field" for="taskOwner">Responsable</label><input id="taskOwner" name="owner" required maxlength="70" placeholder="Ej. Ana">
+    <label class="field" for="taskProject">Proyecto</label><input id="taskProject" name="project" required maxlength="90" placeholder="Ej. Instalación CCTV">
+    <label class="field" for="taskDue">Fecha compromiso</label><input id="taskDue" name="due" type="date" required>
+    <label class="field" for="taskNotes">Notas (opcional)</label><textarea id="taskNotes" name="notes" maxlength="500"></textarea>
+    <div class="dialog-actions"><button type="button" class="btn secondary" data-close="editor">Cancelar</button><button class="btn" type="submit">Guardar</button></div>
+  </form>
+</dialog>
+
+<dialog id="blockerDialog">
+  <form id="blockerForm">
+    <h2>Reportar bloqueo</h2><p id="blockerTask" class="dialog-sub"></p>
+    <label class="field" for="blockerReason">¿Qué impide avanzar?</label>
+    <textarea id="blockerReason" required maxlength="500" placeholder="Describe brevemente qué necesitas para avanzar."></textarea>
+    <div class="dialog-actions"><button type="button" class="btn secondary" data-close="blockerDialog">Cancelar</button><button class="btn" type="submit">Guardar bloqueo</button></div>
+  </form>
+</dialog>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+  'use strict';
+  // Preserve the v0.1 data key: no migration or loss of existing local records.
+  const KEY = 'casces_pulso_v1';
+  const VIEW_KEY = 'casces_pulso_view_v2';
+  const PERSON_KEY = 'casces_pulso_employee_v2';
+  const $ = id => document.getElementById(id);
+  let tasks = [];
+  let view = 'owner';
+  let period = 'today';
+  let employee = '';
+  let project = '';
+  let blockingTaskId = null;
+
+  function getStored(key) { try { return localStorage.getItem(key); } catch { return null; } }
+  function store(key, val) { try { localStorage.setItem(key, val); return true; } catch { toast('No se pudo guardar en este navegador.'); return false; } }
+  function localDate(date) { const d = date || new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+  function plusDays(n) { const d=new Date(); d.setDate(d.getDate()+n); return localDate(d); }
+  function weekBounds() { const now=new Date(), mon=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(now.getDay()+6)%7),sun=new Date(mon); sun.setDate(mon.getDate()+6); return [localDate(mon),localDate(sun)]; }
+  function esc(v) { return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function load() {
+    const raw=getStored(KEY);
+    if (raw === null) {
+      tasks = [
+        {id:1,title:'Confirmar llegada de cámaras',owner:'Ana',project:'Instalación CCTV · Cliente Norte',due:plusDays(0),status:'open',notes:''},
+        {id:2,title:'Validar acceso al cuarto de servidores',owner:'Luis',project:'Instalación CCTV · Cliente Norte',due:plusDays(0),status:'blocked',notes:'El cliente todavía no confirma el acceso'},
+        {id:3,title:'Entregar checklist de pruebas',owner:'María',project:'Control de acceso · Oficina Centro',due:plusDays(2),status:'open',notes:''}
+      ];
+      save();
+    } else {
+      try { const parsed=JSON.parse(raw); tasks=Array.isArray(parsed)?parsed.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[]; }
+      catch { tasks=[]; toast('No se pudieron leer los datos guardados.'); }
+    }
+    view=getStored(VIEW_KEY)==='employee'?'employee':'owner';
+    employee=getStored(PERSON_KEY)||'';
+  }
+  function save() { return store(KEY,JSON.stringify(tasks)); }
+  function toast(message) { const node=$('toast'); node.textContent=message; node.hidden=false; }
+  function statusLabel(s) { return s==='blocked'?'Bloqueado':s==='done'?'Terminado':'En curso'; }
+  function sortTasks(a,b) { return (a.status==='done')-(b.status==='done')||String(a.due||'').localeCompare(String(b.due||'')); }
+  function dateTag(t) {
+    const date=String(t.due||'');
+    if(t.status!=='done'&&date<localDate())return '<span class="pill overdue">Vencido</span>';
+    if(t.status!=='done'&&date===localDate())return '<span class="pill due">Hoy</span>';
+    return '';
+  }
+  function taskHtml(t,role) {
+    const status=['blocked','done'].includes(t.status)?t.status:'';
+    const actions=[];
+    if(t.status==='done')actions.push(`<button type="button" class="mini" data-action="open" data-id="${t.id}">Reabrir</button>`);
+    else if(t.status==='blocked'){
+      actions.push(`<button type="button" class="mini primary" data-action="open" data-id="${t.id}">Resolver bloqueo</button>`);
+      actions.push(`<button type="button" class="mini" data-action="block" data-id="${t.id}">Editar motivo</button>`);
+    } else {
+      actions.push(`<button type="button" class="mini primary" data-action="done" data-id="${t.id}">✓ Terminar</button>`);
+      actions.push(`<button type="button" class="mini" data-action="block" data-id="${t.id}">⚑ Reportar bloqueo</button>`);
+    }
+    if(role==='owner') actions.push(`<button type="button" class="mini danger" data-action="delete" data-id="${t.id}">Eliminar</button>`);
+    return `<article class="item"><div class="line"><strong class="item-title">${esc(t.title)}</strong><span class="pill ${status}">${statusLabel(t.status)}</span></div>
+      <div class="meta">${esc(t.project)} · ${esc(t.owner)} · ${esc(t.due)}</div>
+      ${dateTag(t)}${t.notes?`<div class="note">${esc(t.notes)}</div>`:''}
+      <div class="actions">${actions.join('')}</div></article>`;
+  }
+  function syncSelects() {
+    const projects=[...new Set(tasks.map(t=>String(t.project||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    if(project&&!projects.includes(project))project='';
+    $('projectFilter').innerHTML='<option value="">Todos los proyectos</option>'+projects.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+    $('projectFilter').value=project;
+    $('projectCount').textContent=`${projects.length} proyecto${projects.length===1?'':'s'}`;
+    const owners=[...new Set(tasks.map(t=>String(t.owner||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    if(!owners.includes(employee))employee=owners[0]||'';
+    $('employeeSelect').innerHTML=owners.length?owners.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join(''):'<option value="">Sin responsables</option>';
+    $('employeeSelect').value=employee;
+  }
+  function render() {
+    syncSelects();
+    $('ownerView').hidden=view!=='owner'; $('employeeView').hidden=view!=='employee';
+    document.querySelectorAll('[data-view]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.view===view)));
+    document.querySelectorAll('[data-period]').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.period===period)));
+    $('total').textContent=tasks.length;
+    $('today').textContent=tasks.filter(t=>t.due===localDate()&&t.status!=='done').length;
+    $('blocked').textContent=tasks.filter(t=>t.status==='blocked').length;
+    $('done').textContent=tasks.filter(t=>t.status==='done').length;
+    const ownerTasks=tasks.filter(t=>!project||t.project===project).sort(sortTasks);
+    $('ownerTasks').innerHTML=ownerTasks.length?ownerTasks.map(t=>taskHtml(t,'owner')).join(''):'<div class="empty">No hay entregables en este proyecto. Crea uno nuevo para empezar.</div>';
+    const blocked=tasks.filter(t=>t.status==='blocked').sort(sortTasks);
+    $('attention').innerHTML=blocked.length?blocked.map(t=>`<article class="item"><span class="pill blocked">Requiere apoyo</span><div class="item-title" style="margin-top:11px">${esc(t.title)}</div><div class="meta">${esc(t.project)} · ${esc(t.owner)}</div><div class="note">${esc(t.notes||'Sin detalle del bloqueo.')}</div><div class="actions"><button type="button" class="mini primary" data-action="open" data-id="${t.id}">Marcar resuelto</button></div></article>`).join(''):'<div class="empty">Sin bloqueos reportados. ✨</div>';
+    const mine=tasks.filter(t=>t.owner===employee);
+    $('employeeDone').textContent=mine.filter(t=>t.status==='done').length;
+    $('employeeBlocked').textContent=mine.filter(t=>t.status==='blocked').length;
+    const [mon,sun]=weekBounds();
+    const visible=mine.filter(t=>period==='all'||(period==='today'?t.due===localDate():t.due>=mon&&t.due<=sun)).sort(sortTasks);
+    $('employeeTasks').innerHTML=!employee?'<div class="empty">El dueño debe crear primero un entregable y asignarle un responsable.</div>':visible.length?visible.map(t=>taskHtml(t,'employee')).join(''):`<div class="empty">No tienes entregables para ${period==='today'?'hoy':period==='week'?'esta semana':'este período'}. Prueba con «Todos».</div>`;
+  }
+  function setStatus(id,status) { const t=tasks.find(x=>x.id===id); if(!t)return; t.status=status; save(); render(); }
+  function newId() { const max=tasks.reduce((m,t)=>Math.max(m,t.id),0); return max<Number.MAX_SAFE_INTEGER?max+1:Date.now(); }
+  function doAction(action,id) {
+    const t=tasks.find(x=>x.id===id); if(!t)return;
+    if(action==='done')return setStatus(id,'done');
+    if(action==='open')return setStatus(id,'open');
+    if(action==='block') { blockingTaskId=id; $('blockerTask').textContent=t.title; $('blockerReason').value=t.notes||''; $('blockerDialog').showModal(); return; }
+    if(action==='delete'&&view==='owner'&&confirm('¿Eliminar este entregable?')) {tasks=tasks.filter(x=>x.id!==id); save(); render();}
+  }
+  document.addEventListener('click',event=>{
+    const btn=event.target.closest('button'); if(!btn)return;
+    if(btn.dataset.view){view=btn.dataset.view;store(VIEW_KEY,view);render();}
+    else if(btn.dataset.period){period=btn.dataset.period;render();}
+    else if(btn.dataset.action){const id=Number(btn.dataset.id);if(Number.isSafeInteger(id))doAction(btn.dataset.action,id);}
+    else if(btn.dataset.close){$(btn.dataset.close).close();}
+  });
+  $('employeeSelect').addEventListener('change',event=>{employee=event.target.value;store(PERSON_KEY,employee);render();});
+  $('projectFilter').addEventListener('change',event=>{project=event.target.value;render();});
+  $('newTask').addEventListener('click',()=>{ $('taskform').reset(); $('taskDue').value=localDate(); $('editor').showModal(); });
+  $('taskform').addEventListener('submit',event=>{
+    event.preventDefault();
+    const data=Object.fromEntries(new FormData(event.target));
+    const title=String(data.title||'').trim(),owner=String(data.owner||'').trim(),p=String(data.project||'').trim(),due=String(data.due||'');
+    if(!title||!owner||!p||!/^\d{4}-\d{2}-\d{2}$/.test(due))return;
+    tasks.push({id:newId(),title,owner,project:p,due,notes:String(data.notes||'').trim(),status:'open'});
+    project=''; save(); render(); $('editor').close();
+  });
+  $('blockerForm').addEventListener('submit',event=>{
+    event.preventDefault();const t=tasks.find(x=>x.id===blockingTaskId);
+    const reason=$('blockerReason').value.trim(); if(!t||!reason)return;
+    t.status='blocked';t.notes=reason; save();render();$('blockerDialog').close();blockingTaskId=null;
+  });
+  // Other tabs of the same browser refresh when tasks change.
+  window.addEventListener('storage',event=>{if(event.key!==KEY)return;try{const next=JSON.parse(event.newValue||'[]');tasks=Array.isArray(next)?next.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[];render();}catch{toast('No se pudieron actualizar los datos desde otra pestaña.');}});
+  load(); render();
+</script>
+</body>
+</html>
