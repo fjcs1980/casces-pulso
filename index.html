@@ -67,6 +67,29 @@
     .info-box{border-radius:12px;background:#f7f8fd;padding:15px;color:#67758c;font-size:12px;line-height:1.65}
     .info-box strong{color:#2e3c57}.info-box p{margin:0}
     .employee-summary{display:flex;gap:10px;align-items:baseline;color:#66758b;font-size:12px;margin-top:13px}.employee-summary strong{font-size:29px;letter-spacing:-1px;color:#202d45}
+    /* PULSO-004: Reporting by Doing — read-only event feed, derived from each task history. */
+    .timeline-panel{margin:0 0 16px;padding:23px}
+    .timeline-subtitle{font-size:12px;color:#78869a;line-height:1.5;margin:6px 0 0}
+    .timeline-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+    .timeline-tag{border-radius:99px;background:#f1f2ff;color:#5158b9;font-size:11px;font-weight:760;padding:8px 11px;white-space:nowrap}
+    .timeline-day{margin:0 0 20px}.timeline-day:last-child{margin-bottom:0}
+    .timeline-day h3{font-size:12px;color:#8793a7;font-weight:780;text-transform:capitalize;margin:0 0 13px;letter-spacing:.01em}
+    .timeline-list{list-style:none;margin:0 0 0 7px;padding:0 0 0 22px;border-left:2px solid #ebedf9}
+    .timeline-event{position:relative;min-width:0;padding:0 0 18px 5px}
+    .timeline-event:last-child{padding-bottom:1px}
+    .timeline-event::before{content:'';position:absolute;left:-31px;top:4px;width:11px;height:11px;border:3px solid #fff;border-radius:50%;background:#6772ef;box-shadow:0 0 0 2px #dce1ff}
+    .timeline-event.blocker_reported::before{background:#e48051;box-shadow:0 0 0 2px #ffe3d5}
+    .timeline-event.blocker_updated::before{background:#ba8555;box-shadow:0 0 0 2px #fff0db}
+    .timeline-event.blocker_resolved::before{background:#299f76;box-shadow:0 0 0 2px #d7f2e5}
+    .timeline-event.done::before{background:#4c61d2;box-shadow:0 0 0 2px #dce1ff}
+    .timeline-event-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .timeline-label{font-size:12px;font-weight:780;color:#34435f}
+    .timeline-event.blocker_reported .timeline-label{color:#a9542f}
+    .timeline-event.blocker_resolved .timeline-label{color:#1f8965}
+    .timeline-event time{font-size:11px;color:#8e9ab0;font-variant-numeric:tabular-nums}
+    .timeline-task{font-size:14px;font-weight:750;color:#1d2d46;line-height:1.45;margin:5px 0 0;overflow-wrap:anywhere}
+    .timeline-project{font-size:12px;color:#79879a;margin:3px 0 0;overflow-wrap:anywhere}
+    .timeline-privacy{font-size:11px;line-height:1.5;color:#8a96a7;margin:15px 0 0}
     .foot{font-size:11px;line-height:1.65;color:#919cae;margin-top:24px}
     .view[hidden]{display:none!important}
     input[type="range"]{width:100%;padding:0;accent-color:#545ce4;min-height:28px}
@@ -114,6 +137,17 @@
         <div class="stat complete"><small>Terminados</small><strong id="done">0</strong></div>
         <div class="stat alert"><small>Vencidos</small><strong id="overdue">0</strong></div>
       </section>
+      <section class="panel timeline-panel" aria-labelledby="timelineTitle">
+        <div class="timeline-head">
+          <div>
+            <h2 id="timelineTitle">Lo que está pasando</h2>
+            <p class="timeline-subtitle">Línea de tiempo que se construye automáticamente cuando el equipo termina entregables o informa y resuelve bloqueos.</p>
+          </div>
+          <span id="timelineCount" class="timeline-tag">0 acontecimientos</span>
+        </div>
+        <div id="timelineFeed" aria-live="polite" aria-relevant="additions text"></div>
+        <p class="timeline-privacy">Solo mostramos el tipo de acontecimiento, el entregable, el proyecto y su fecha. Las notas y el contenido de las decisiones no se publican aquí. Información local de este navegador.</p>
+      </section>
       <div class="layout">
         <section class="panel" aria-label="Plan de trabajo">
           <div class="panel-header"><div><h2>Plan de trabajo</h2><span class="hint" id="projectCount"></span></div><div class="filters"><select id="projectFilter" class="select" aria-label="Filtrar por proyecto"><option value="">Todos los proyectos</option></select><select id="riskFilter" class="select" aria-label="Filtrar por situación"><option value="all">Todos</option><option value="overdue">Vencidos</option><option value="blocked">Bloqueados</option><option value="active">En ejecución</option></select></div></div>
@@ -124,6 +158,7 @@
           <div id="attention"></div>
         </section>
       </div>
+
     </div>
 
     <div class="view" id="employeeView" hidden>
@@ -149,7 +184,7 @@
           <div class="employee-summary"><strong id="employeeBlocked">0</strong><span>bloqueos pendientes</span></div>
           <div style="height:1px;background:#ecf0f6;margin:21px 0"></div>
           <div class="side-label">Comunicación simple</div>
-          <div class="info-box"><p><strong>¿Algo impide continuar?</strong> Abre el entregable y usa «Reportar bloqueo». El motivo aparecerá en Vista general de este navegador, donde se podrá registrar una decisión.</p></div>
+          <div class="info-box"><p><strong>¿Algo impide continuar?</strong> Abre el entregable y usa «Reportar bloqueo». El motivo aparecerá en Vista general de este navegador, donde se podrá registrar una decisión. Tus acciones alimentan la línea de tiempo automáticamente.</p></div>
         </aside>
       </div>
     </div>
@@ -226,7 +261,56 @@
   function progress(t) { const n=Number(t.progress);return Number.isFinite(n)?Math.max(0,Math.min(100,Math.round(n))):t.status==='done'?100:0; }
   function priority(t) { return ['high','normal','low'].includes(t.priority)?t.priority:'normal'; }
   function history(t) { return Array.isArray(t.history)?t.history.filter(e=>e&&typeof e==='object'):[]; }
-  function log(t,type,detail='') { if(!Array.isArray(t.history))t.history=[];t.history.push({at:stamp(),type:String(type),detail:String(detail)});if(t.history.length>80)t.history=t.history.slice(-80); }
+  const SHARED_KINDS = Object.freeze({
+    done:'Entregable terminado',
+    blocker_reported:'Bloqueo reportado',
+    blocker_updated:'Bloqueo actualizado',
+    blocker_resolved:'Bloqueo resuelto'
+  });
+  // Task-level detail remains private to the existing task record. Only allowlisted
+  // eventKind plus immutable task/project snapshots are used in the shared timeline.
+  function log(t,type,detail='',eventKind='') {
+    if(!Array.isArray(t.history))t.history=[];
+    const event={at:stamp(),type:String(type),detail:String(detail)};
+    if(Object.prototype.hasOwnProperty.call(SHARED_KINDS,eventKind)){
+      event.eventKind=eventKind;
+      event.taskTitle=String(t.title||'');
+      event.project=String(t.project||'');
+    }
+    t.history.push(event);
+    if(t.history.length>80)t.history=t.history.slice(-80);
+  }
+  function sharedEvents() {
+    // Never use event.detail: it may contain private blocker reasons, progress notes
+    // or decision text. Legacy events are intentionally not backfilled or guessed.
+    return tasks.flatMap(t=>history(t).filter(e=>
+      typeof e.eventKind==='string' && Object.prototype.hasOwnProperty.call(SHARED_KINDS,e.eventKind)
+      && typeof e.at==='string' && Number.isFinite(Date.parse(e.at))
+    ).map(e=>({at:e.at,kind:e.eventKind,title:String(e.taskTitle??t.title??''),project:String(e.project??t.project??'')})))
+      .sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+  }
+  function renderTimeline(){
+    const events=sharedEvents().filter(e=>!project||e.project===project);
+    $('timelineCount').textContent=`${events.length} acontecimiento${events.length===1?'':'s'}`;
+    if(!events.length){
+      $('timelineFeed').innerHTML='<div class="empty">Todavía no hay acontecimientos registrados'+(project?' en este proyecto':'')+'. Termina un entregable o reporta un bloqueo para comenzar la línea de tiempo. Los eventos anteriores no se reconstruyen automáticamente.</div>';
+      return;
+    }
+    const today=localDate(),yesterday=plusDays(-1);
+    const groups=new Map();
+    for(const e of events.slice(0,30)){
+      const d=new Date(e.at),date=localDate(d);
+      if(!groups.has(date))groups.set(date,[]);
+      groups.get(date).push(e);
+    }
+    $('timelineFeed').innerHTML=[...groups.entries()].map(([date,items])=>{
+      const heading=date===today?'Hoy':date===yesterday?'Ayer':new Date(date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
+      return `<section class="timeline-day"><h3>${esc(heading)}</h3><ol class="timeline-list">${items.map(e=>{
+        const time=new Date(e.at).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
+        return `<li class="timeline-event ${e.kind}"><div class="timeline-event-head"><span class="timeline-label">${SHARED_KINDS[e.kind]}</span><time datetime="${esc(e.at)}">${esc(time)}</time></div><p class="timeline-task">${esc(e.title)}</p><p class="timeline-project">${esc(e.project)}</p></li>`;
+      }).join('')}</ol></section>`;
+    }).join('');
+  }
   function blockerReason(t) { return String(t.blockerReason || (t.status==='blocked'?t.notes:'') || 'Sin detalle.'); }
   function isOverdue(t) { return t.status!=='done' && String(t.due||'') < localDate(); }
   function taskById(id) { return tasks.find(t=>t.id===id); }
@@ -307,6 +391,7 @@
       risk==='all'||risk==='overdue'&&isOverdue(t)||risk==='blocked'&&t.status==='blocked'||risk==='active'&&t.status!=='done'&&t.status!=='blocked'
     )).sort(sortTasks);
     $('ownerTasks').innerHTML=ownerTasks.length?ownerTasks.map(t=>taskHtml(t,'owner')).join(''):'<div class="empty">No hay entregables con este filtro.</div>';
+    renderTimeline();
     const urgent=tasks.filter(t=>t.status==='blocked'||isOverdue(t)).sort((a,b)=>(a.status!=='blocked')-(b.status!=='blocked')||sortTasks(a,b));
     $('attention').innerHTML=urgent.length?urgent.map(t=>`<article class="item"><div class="line"><span class="pill ${t.status==='blocked'?'blocked':'overdue'}">${t.status==='blocked'?'Bloqueo pendiente':'Fecha vencida'}</span>${dateTag(t)}</div><div class="item-title" style="margin-top:11px">${esc(t.title)}</div><div class="meta">${esc(t.project)} · ${esc(t.owner)}</div>
       <div class="note">${t.status==='blocked'?esc(blockerReason(t)): `Compromiso: ${esc(t.due)} · Reprogramar en «Editar».`}</div>
@@ -323,7 +408,7 @@
   function changeStatus(id,status) {
     const t=taskById(id);if(!t)return;
     t.status=status;
-    if(status==='done'){t.progress=100;log(t,'Entregable terminado');}
+    if(status==='done'){t.progress=100;log(t,'Entregable terminado','','done');}
     else if(status==='open'){t.progress=0;log(t,'Entregable reabierto');}
     save();render();
   }
@@ -388,15 +473,17 @@
   $('progressForm').addEventListener('submit',e=>{
     e.preventDefault();const t=taskById(progressId),n=Number($('progressPercent').value),note=$('progressNote').value.trim();
     if(!t||!Number.isInteger(n)||n<0||n>100||n%10!==0||!note)return;
+    const wasDone=t.status==='done';
     t.progress=n;if(t.status!=='blocked')t.status=n===100?'done':n>0?'in_progress':'open';
-    log(t,n===100&&t.status==='done'?'Avance completado':'Avance registrado',`${n}% · ${note}`);
+    log(t,n===100&&t.status==='done'?'Avance completado':'Avance registrado',`${n}% · ${note}`,t.status==='done'&&!wasDone?'done':'');
     save();render();$('progressDialog').close();progressId=null;
   });
   $('blockerForm').addEventListener('submit',e=>{
     e.preventDefault();const t=taskById(blockingId),reason=$('blockerReason').value.trim();
     if(!t||!reason)return;
+    const wasBlocked=t.status==='blocked';
     t.blockerReason=reason;t.blockerRequest=$('blockerRequest').value.trim();t.blockedAt=stamp();t.status='blocked';
-    log(t,'Bloqueo reportado',reason+(t.blockerRequest?' · Se necesita: '+t.blockerRequest:''));
+    log(t,wasBlocked?'Bloqueo actualizado':'Bloqueo reportado',reason+(t.blockerRequest?' · Se necesita: '+t.blockerRequest:''),wasBlocked?'blocker_updated':'blocker_reported');
     save();render();$('blockerDialog').close();blockingId=null;
   });
   $('decisionForm').addEventListener('submit',e=>{
@@ -405,7 +492,7 @@
     t.lastDecision=decision;t.status=progress(t)>0?'in_progress':'open';
     t.blockerReason='';t.blockerRequest='';t.blockedAt=null;
     if(due)t.due=due;
-    log(t,'Decisión registrada',decision+(due?' · Nueva fecha: '+due:''));
+    log(t,'Decisión registrada',decision+(due?' · Nueva fecha: '+due:''),'blocker_resolved');
     save();render();$('decisionDialog').close();decisionId=null;
   });
   window.addEventListener('storage',e=>{if(e.key!==KEY)return;try{const v=JSON.parse(e.newValue||'[]');tasks=Array.isArray(v)?v.filter(t=>t&&typeof t==='object'&&Number.isSafeInteger(t.id)):[];render();}catch{toast('No se pudieron actualizar los datos desde otra pestaña.');}});
